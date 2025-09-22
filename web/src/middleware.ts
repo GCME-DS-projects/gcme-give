@@ -5,13 +5,13 @@ export async function middleware(request: NextRequest) {
   console.log('Middleware triggered for path: ', pathname);
   
   // Protected routes
-  const protectedRoutes = ['/dashboard', '/profile'];
+  const protectedRoutes = ['/admin'];
   
   if (protectedRoutes.some(route => pathname.startsWith(route))) {
     const sessionCookie = request.cookies.get('better-auth.session_token');
     
     if (!sessionCookie) {
-      return NextResponse.redirect(new URL('/', request.url));
+      return NextResponse.redirect(new URL('/auth/sign-in', request.url));
     }
   }
   
@@ -19,5 +19,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/:path*']
+  matcher: ['/admin/:path*']
 };

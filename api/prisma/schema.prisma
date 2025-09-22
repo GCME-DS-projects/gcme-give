@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ROLE{
+  MISSINARY,
+  ADMIN,
+  SUPER_ADMIN
+}
+
 model User {
   id            String       @id @default(uuid())
   email         String       @unique
@@ -21,6 +27,17 @@ model User {
 
   @@map("user")
   @@index([email])
+}
+
+model UserRole{
+  id          String        @id   @default(uuid())
+  userId      String
+  user        User           @relation(fields: [userId], references: [id])
+
+  strategyId  String?
+  Strategy    Strategy?      @relation(fields: [strategyId], references: [id])
+
+  role        ROLE
 }
 
 model Session {
