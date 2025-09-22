@@ -1,26 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
 
 @Injectable()
 export class MissionariesService {
-  create(createMissionaryDto: CreateMissionaryDto) {
-    return 'This action adds a new missionary';
+  constructor(private prisma: PrismaService) {}
+
+  async create(dto: CreateMissionaryDto) {
+    return this.prisma.missionary.create({ data: dto });
   }
 
-  findAll() {
-    return `This action returns all missionaries`;
+  async findAll() {
+    return this.prisma.missionary.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} missionary`;
+  async findOne(id: string) {
+    const missionary = await this.prisma.missionary.findUnique({ where: { id } });
+    if (!missionary) throw new NotFoundException(`Missionary with id ${id} not found`);
+    return missionary;
   }
 
-  update(id: number, updateMissionaryDto: UpdateMissionaryDto) {
-    return `This action updates a #${id} missionary`;
+  async update(id: string, dto: UpdateMissionaryDto) {
+    await this.findOne(id);
+    return this.prisma.missionary.update({ where: { id }, data: dto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} missionary`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.missionary.update({ where: { id }, data: { isDeleted: true } });
   }
 }

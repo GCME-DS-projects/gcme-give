@@ -145,8 +145,9 @@ model Projects {
 
 model Strategy {
   id            String         @id @default(uuid())
-  name          String
+  name          String         @unique
   description   String?
+  imagePath     String?
   missionaries  Missionary[]
   projects      Projects[]
   contributions Contribution[]

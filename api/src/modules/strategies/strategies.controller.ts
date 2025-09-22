@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body } from '@nestjs/common';
 import { StrategiesService } from './strategies.service';
 import { CreateStrategyDto } from './dto/create-strategy.dto';
 import { UpdateStrategyDto } from './dto/update-strategy.dto';
@@ -8,8 +8,8 @@ export class StrategiesController {
   constructor(private readonly strategiesService: StrategiesService) {}
 
   @Post()
-  create(@Body() createStrategyDto: CreateStrategyDto) {
-    return this.strategiesService.create(createStrategyDto);
+  create(@Body() dto: CreateStrategyDto) {
+    return this.strategiesService.create(dto);
   }
 
   @Get()
@@ -19,16 +19,16 @@ export class StrategiesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.strategiesService.findOne(+id);
+    return this.strategiesService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStrategyDto: UpdateStrategyDto) {
-    return this.strategiesService.update(+id, updateStrategyDto);
+  update(@Param('id') id: string, @Body() dto: UpdateStrategyDto) {
+    return this.strategiesService.update(id, dto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.strategiesService.remove(+id);
+    return this.strategiesService.remove(id);
   }
 }
