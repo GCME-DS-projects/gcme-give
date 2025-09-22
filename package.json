@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"cd api && nest start --watch\""
+    "dev": "concurrently \"cd api && nest start --watch\" \"cd web && npm run dev\""
   },
   "author": "",
   "license": "ISC",
