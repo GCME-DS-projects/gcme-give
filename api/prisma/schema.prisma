@@ -1,0 +1,218 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  name          String?
+  emailVerified Boolean      @default(false)
+  image         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now()) @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  missionary    Missionary?
+
+  @@map("user")
+  @@index([email])
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+  @@index([userId])
+  @@index([providerId, accountId])
+}
+
+model Verification {
+  id         String   @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@map("verification")
+  @@index([identifier])
+}
+
+model Missionary {
+  id                String     @id @default(uuid())
+  userId            String     @unique
+  title             String?
+  phone             String?
+  shortBio          String?
+  fullBio           String?
+  location          String?
+  qualification     String?
+  website           String?
+  experience        String?
+  years             String?
+  mission           String?
+  focus             String?
+  status            String?
+  prayerRequests    String[]
+  recentUpdates     Json?
+  supportNeeds      Json?
+  type              String?
+  role              String?
+  strategyId        String?
+  livesImpacted     Int?
+  communitiesServed Int?
+  projectsCompleted Int?
+  isDeleted         Boolean    @default(false)
+  staffId           String?
+  parentRc          String?
+  rcAccount         String?
+  designationNumber String?
+  region            String?
+
+  Strategy          Strategy?      @relation(fields: [strategyId], references: [id])
+  contributions     Contribution[]
+  user              User           @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([strategyId])
+  @@index([staffId])
+  @@index([region])
+}
+
+model Projects {
+  id               String         @id @default(uuid())
+  title            String
+  slug             String         @unique
+  shortDescription String
+  image            Bytes?
+  category         String?
+  location         String?
+  duration         String?
+  teamSize         String?
+  fundingGoal      String?
+  fundingRaised    String?
+  beneficiaries    String?
+  problem          String?
+  solution         String?
+  urgency          String?
+  urgencyFactors   String[]
+  impact           String[]
+  timeLine         Json?
+  testimonials     Json?
+  strategyId       String?
+  Strategy         Strategy?       @relation(fields: [strategyId], references: [id])
+  contributions    Contribution[]
+  isDeleted        Boolean         @default(false)
+  createdAt        DateTime        @default(now())
+
+  @@map("Projects")
+  @@index([slug])
+  @@index([strategyId])
+}
+
+model Strategy {
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  missionaries  Missionary[]
+  projects      Projects[]
+  contributions Contribution[]
+
+  @@index([name])
+}
+
+model Contributor {
+  id            String         @id @default(uuid())
+  name          String?
+  email         String?        @unique
+  phone         String?
+  message       String?
+  contributions Contribution[]
+
+  @@index([email])
+  @@index([phone])
+}
+
+model Contribution {
+  id            String        @id @default(uuid())
+  amount        Float
+  contributorId String
+  projectId     String?
+  missionaryId  String?
+  strategyId    String?
+  transactionId String?
+
+  project       Projects?     @relation(fields: [projectId], references: [id])
+  missionary    Missionary?   @relation(fields: [missionaryId], references: [id])
+  strategy      Strategy?     @relation(fields: [strategyId], references: [id])
+  transaction   Transaction?  @relation("ContributionToTransaction")
+
+  contributor   Contributor   @relation(fields: [contributorId], references: [id])
+
+  createdAt     DateTime      @default(now())
+  status        String
+  paymentMethod String?
+  isDeleted     Boolean       @default(false)
+
+  @@index([contributorId])
+  @@index([projectId])
+  @@index([missionaryId])
+  @@index([strategyId])
+}
+
+enum TRANSACTION_STATUS {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum PAYMENT_METHOD {
+  TELEBIRR
+  BANK
+}
+
+model Transaction {
+  id             String             @id @default(uuid())
+  contributionId String             @unique
+  contribution   Contribution       @relation("ContributionToTransaction", fields: [contributionId], references: [id])
+  status         TRANSACTION_STATUS
+  paymentMethod  PAYMENT_METHOD
+  createdAt      DateTime           @default(now())
+  isDeleted      Boolean            @default(false)
+
+  @@index([contributionId])
+  @@index([status])
+}
