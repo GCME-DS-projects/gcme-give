@@ -1,26 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateStrategyDto } from './dto/create-strategy.dto';
 import { UpdateStrategyDto } from './dto/update-strategy.dto';
 
 @Injectable()
 export class StrategiesService {
-  create(createStrategyDto: CreateStrategyDto) {
-    return 'This action adds a new strategy';
+  constructor(private prisma: PrismaService) {}
+
+  async create(dto: CreateStrategyDto) {
+    return this.prisma.strategy.create({ data: dto });
   }
 
-  findAll() {
-    return `This action returns all strategies`;
+  async findAll() {
+    return this.prisma.strategy.findMany({
+      include: {
+        missionaries: true,
+        projects: true,
+        contributions: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} strategy`;
+  async findOne(id: string) {
+    const strategy = await this.prisma.strategy.findUnique({
+      where: { id },
+      include: {
+        missionaries: true,
+        projects: true,
+        contributions: true,
+      },
+    });
+    if (!strategy) throw new NotFoundException(`Strategy with id ${id} not found`);
+    return strategy;
   }
 
-  update(id: number, updateStrategyDto: UpdateStrategyDto) {
-    return `This action updates a #${id} strategy`;
+  async update(id: string, dto: UpdateStrategyDto) {
+    await this.findOne(id);
+    return this.prisma.strategy.update({ where: { id }, data: dto });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} strategy`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.prisma.strategy.delete({ where: { id } });
   }
 }
