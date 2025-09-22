@@ -6,6 +6,12 @@ const prisma = new PrismaClient();
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
-    provider: "sqlite",
+    provider: "postgresql",
   }),
+  trustedOrigins: [
+    process.env.WEB_URL || "http://localhost:3000",
+  ],
+  emailAndPassword: {
+    enabled: true,
+  }
 });
