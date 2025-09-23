@@ -9,7 +9,21 @@ const nextConfig: NextConfig = {
         destination: `${process.env.API_URL || 'http://localhost:3000'}/api/auth/:path*`,
       },
     ];
-  }
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: '**',      
+        pathname: '/**',     
+      },
+      {
+        protocol: 'https',
+        hostname: '**',
+        pathname: '/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
