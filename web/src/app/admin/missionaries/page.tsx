@@ -1,8 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { Missionary, Strategy, Pagination } from "./types";
+import { Missionary, Strategy, Pagination, QueryMissionaryDto, CreateMissionaryDto, UpdateMissionaryDto } from "@/lib/types";
+
+// Import React Query hooks
+import { 
+  useGetMissionaries, 
+  useCreateMissionary, 
+  useUpdateMissionary, 
+  useRemoveMissionary 
+} from "@/hooks/queries/use-missionaries-query";
 
 // Import the new components
 import PageHeader from "./components/PageHeader";
@@ -19,9 +27,7 @@ export const dynamic = 'force-dynamic';
 type ModalType = 'add' | 'edit' | 'view' | 'delete';
 
 export default function AdminMissionariesPage() {
-  const [missionaries, setMissionaries] = useState<Missionary[]>([]);
   const [strategies, setStrategies] = useState<Strategy[]>([]);
-  const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 10, total: 0, pages: 1 });
   
   // State for filters
@@ -37,36 +43,23 @@ export default function AdminMissionariesPage() {
   const [modalType, setModalType] = useState<ModalType | null>(null);
   const [selectedMissionary, setSelectedMissionary] = useState<Missionary | null>(null);
 
-  // Fetch missionaries
-  const fetchMissionaries = useCallback(async () => {
-    setLoading(true);
-    const params = new URLSearchParams();
-    if (filters.search) params.append("search", filters.search);
-    if (filters.status !== "all") params.append("status", filters.status);
-    if (filters.type !== "all") params.append("type", filters.type);
-    params.append("page", String(pagination.page));
-    params.append("limit", String(pagination.limit));
-    
-    try {
-      const res = await fetch(`/api/admin/missionaries?${params.toString()}`);
-      const data = await res.json();
-      setMissionaries(data.missionaries || []);
-      if (data.pagination) {
-        setPagination(data.pagination);
-      }
-    } catch (e) {
-      console.error("Failed to fetch missionaries:", e);
-      setMissionaries([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, pagination.page, pagination.limit]);
+  // Build query parameters for API
+  const queryParams: QueryMissionaryDto = {
+    page: pagination.page,
+    limit: pagination.limit,
+    ...(filters.search && { search: filters.search }),
+    ...(filters.status !== "all" && { status: filters.status }),
+    ...(filters.type !== "all" && { type: filters.type }),
+    ...(filters.strategy !== "all" && { strategyId: filters.strategy }),
+  };
 
-  useEffect(() => {
-    fetchMissionaries();
-  }, [fetchMissionaries]);
+  // Use React Query hooks
+  const { data: missionaries = [], isLoading, error } = useGetMissionaries(queryParams);
+  const createMissionaryMutation = useCreateMissionary();
+  const updateMissionaryMutation = useUpdateMissionary();
+  const deleteMissionaryMutation = useRemoveMissionary();
 
-  // Fetch strategies
+  // Fetch strategies (keeping this as manual fetch for now since we don't have strategies hooks yet)
   useEffect(() => {
     const fetchStrategies = async () => {
       try {
@@ -97,41 +90,59 @@ export default function AdminMissionariesPage() {
   // CRUD handlers
   const handleSave = async (formData: FormData, missionaryId?: string) => {
     const isEdit = !!missionaryId;
-    const url = isEdit ? `/api/admin/missionaries/${missionaryId}` : "/api/admin/missionaries";
-    const method = isEdit ? "PUT" : "POST";
-
+    
     try {
-      const response = await fetch(url, { method, body: formData });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || `Failed to ${isEdit ? 'update' : 'create'} missionary`);
+      if (isEdit) {
+        // Convert FormData to UpdateMissionaryDto
+        const updateData: UpdateMissionaryDto = {};
+        for (const [key, value] of formData.entries()) {
+          if (key === 'supportNeeds' || key === 'recentUpdates') {
+            updateData[key as keyof UpdateMissionaryDto] = JSON.parse(value as string);
+          } else if (key !== 'image') {
+            updateData[key as keyof UpdateMissionaryDto] = value as string;
+          }
+        }
+        await updateMissionaryMutation.mutateAsync({ id: missionaryId, data: updateData });
+      } else {
+        // Convert FormData to CreateMissionaryDto
+        const createData: CreateMissionaryDto = {
+          userId: 'temp-user-id', // This should be set from the current user context
+          ...Object.fromEntries(formData.entries()) as Partial<CreateMissionaryDto>
+        };
+        
+        // Handle special fields
+        for (const [key, value] of formData.entries()) {
+          if (key === 'supportNeeds' || key === 'recentUpdates') {
+            createData[key as keyof CreateMissionaryDto] = JSON.parse(value as string);
+          } else if (key === 'imageUrl') {
+            createData.imageUrl = value as string;
+          } else if (key !== 'image') {
+            createData[key as keyof CreateMissionaryDto] = value as string;
+          }
+        }
+        
+        await createMissionaryMutation.mutateAsync(createData);
       }
       closeModal();
-      fetchMissionaries(); // Refresh list
     } catch (error) {
       console.error(error);
-      alert((error as Error).message);
+      // Error handling is done by the mutation hooks with toast notifications
     }
   };
   
   const handleDelete = async () => {
     if (!selectedMissionary) return;
     try {
-      const response = await fetch(`/api/admin/missionaries/${selectedMissionary.id}`, { method: "DELETE" });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to delete missionary");
-      }
+      await deleteMissionaryMutation.mutateAsync(selectedMissionary.id);
       closeModal();
-      fetchMissionaries(); // Refresh list
     } catch (error) {
       console.error(error);
-      alert((error as Error).message);
+      // Error handling is done by the mutation hooks with toast notifications
     }
   };
 
   const handlePageChange = (newPage: number) => {
-    setPagination(p => ({ ...p, page: newPage }));
+    setPagination((p: Pagination) => ({ ...p, page: newPage }));
   };
 
   return (
@@ -141,9 +152,13 @@ export default function AdminMissionariesPage() {
       <FilterBar filters={filters} onFiltersChange={setFilters} strategies={strategies} />
       
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto relative">
-        {loading ? (
+        {isLoading ? (
           <div className="flex justify-center items-center p-8">
             <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+          </div>
+        ) : error ? (
+          <div className="flex justify-center items-center p-8">
+            <div className="text-red-600">Error loading missionaries: {(error as Error).message}</div>
           </div>
         ) : (
           <MissionariesTable
@@ -155,7 +170,7 @@ export default function AdminMissionariesPage() {
         )}
       </div>
 
-      {!loading && missionaries.length > 0 && (
+      {!isLoading && !error && missionaries.length > 0 && (
         <PaginationControls pagination={pagination} onPageChange={handlePageChange} />
       )}
       
@@ -183,7 +198,7 @@ export default function AdminMissionariesPage() {
           isOpen={isModalOpen}
           onClose={closeModal}
           onConfirm={handleDelete}
-          missionaryName={selectedMissionary.name}
+          missionaryName={selectedMissionary.user?.name || 'Unknown'}
         />
       )}
     </div>

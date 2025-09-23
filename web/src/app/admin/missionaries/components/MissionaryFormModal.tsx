@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Missionary, Strategy, SupportNeed } from "../types";
+import { Missionary, Strategy, SupportNeed, CreateMissionaryDto, UpdateMissionaryDto } from "@/lib/types";
 import { X, Save, Plus, Upload, Loader2 } from "lucide-react";
 
 interface MissionaryFormModalProps {
@@ -10,8 +10,20 @@ interface MissionaryFormModalProps {
   strategies: Strategy[];
 }
 
-const emptyForm: Omit<Missionary, 'id'> = {
-  name: "", title: "", email: "", phone: "", location: "", years: 0, focus: "", type: "Full-time", strategy: "", status: "Active", shortBio: "", supportNeeds: []
+const emptyForm: Partial<CreateMissionaryDto> = {
+  title: "", 
+  phone: "", 
+  location: "", 
+  years: "", 
+  focus: "", 
+  type: "Full-time", 
+  strategyId: "", 
+  status: "Active", 
+  shortBio: "", 
+  fullBio: "",
+  mission: "",
+  website: "",
+  supportNeeds: []
 };
 
 export default function MissionaryFormModal({ isOpen, onClose, onSave, missionary, strategies }: MissionaryFormModalProps) {
@@ -24,8 +36,23 @@ export default function MissionaryFormModal({ isOpen, onClose, onSave, missionar
 
   useEffect(() => {
     if (missionary) {
-      setForm(missionary);
-      setImagePreview(missionary.image || null);
+      // Convert missionary to form data, ensuring all fields are present
+      setForm({
+        title: missionary.title || "",
+        phone: missionary.phone || "",
+        location: missionary.location || "",
+        years: missionary.years || "",
+        focus: missionary.focus || "",
+        type: missionary.type || "Full-time",
+        strategyId: missionary.strategyId || "",
+        status: missionary.status || "Active",
+        shortBio: missionary.shortBio || "",
+        fullBio: missionary.fullBio || "",
+        mission: missionary.mission || "",
+        website: missionary.website || "",
+        supportNeeds: missionary.supportNeeds || []
+      });
+      setImagePreview(missionary.image || missionary.user?.image || null);
     } else {
       setForm(emptyForm);
       setImagePreview(null);
@@ -114,17 +141,36 @@ export default function MissionaryFormModal({ isOpen, onClose, onSave, missionar
 
            {/* Form Fields */}
            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             {/* Name */}
-             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                <input type="text" name="name" value={form.name} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-300 rounded-lg"/>
-            </div>
             {/* Title */}
              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                <input type="text" name="title" value={form.title} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-300 rounded-lg"/>
+                <input type="text" name="title" value={form.title} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg"/>
             </div>
-             {/* Add other fields similarly: email, phone, location, years, focus, website... */}
+            {/* Phone */}
+             <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <input type="tel" name="phone" value={form.phone} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg"/>
+            </div>
+            {/* Location */}
+             <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <input type="text" name="location" value={form.location} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-300 rounded-lg"/>
+            </div>
+            {/* Years */}
+             <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+                <input type="text" name="years" value={form.years} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg"/>
+            </div>
+            {/* Focus */}
+             <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Focus Area</label>
+                <input type="text" name="focus" value={form.focus} onChange={handleChange} required className="w-full px-3 py-2 border border-gray-300 rounded-lg"/>
+            </div>
+            {/* Website */}
+             <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                <input type="url" name="website" value={form.website} onChange={handleChange} className="w-full px-3 py-2 border border-gray-300 rounded-lg"/>
+            </div>
             {/* Strategy */}
              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Strategy</label>
@@ -156,7 +202,14 @@ export default function MissionaryFormModal({ isOpen, onClose, onSave, missionar
              <label className="block text-sm font-medium text-gray-700 mb-1">Short Bio</label>
              <textarea name="shortBio" value={form.shortBio} onChange={handleChange} required rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg"/>
            </div>
-           {/* Add fullBio and mission textareas */}
+           <div>
+             <label className="block text-sm font-medium text-gray-700 mb-1">Full Bio</label>
+             <textarea name="fullBio" value={form.fullBio} onChange={handleChange} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-lg"/>
+           </div>
+           <div>
+             <label className="block text-sm font-medium text-gray-700 mb-1">Mission Statement</label>
+             <textarea name="mission" value={form.mission} onChange={handleChange} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-lg"/>
+           </div>
 
            {/* Support Needs */}
            <div>

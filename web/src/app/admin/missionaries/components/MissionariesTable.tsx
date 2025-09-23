@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Missionary } from "../types";
+import { Missionary } from "@/lib/types";
 import { Edit, Trash2, Eye, MapPin, Calendar, Mail, Phone, Globe, ChevronUp, ChevronDown } from "lucide-react";
 
 interface MissionariesTableProps {
@@ -70,15 +70,15 @@ const MissionaryRow = ({ missionary, onView, onEdit, onDelete }: { missionary: M
         <td className="px-6 py-4">
             <div className="flex items-center space-x-3">
                 <img
-                    src={missionary.image || "/placeholder-user.jpg"}
-                    alt={missionary.name}
+                    src={missionary.user?.image || missionary.image || "/placeholder-user.jpg"}
+                    alt={missionary.user?.name || 'Unknown'}
                     className="w-12 h-12 rounded-full object-cover"
                 />
                 <div>
-                    <p className="font-medium text-gray-900">{missionary.name}</p>
-                    <p className="text-sm text-gray-500">{missionary.title}</p>
+                    <p className="font-medium text-gray-900">{missionary.user?.name || 'Unknown'}</p>
+                    <p className="text-sm text-gray-500">{missionary.title || 'No title'}</p>
                     <p className="text-xs text-gray-400 flex items-center">
-                        <Calendar className="w-3 h-3 mr-1" /> {missionary.years} experience
+                        <Calendar className="w-3 h-3 mr-1" /> {missionary.years || '0'} experience
                     </p>
                 </div>
             </div>
@@ -107,11 +107,11 @@ const MissionaryRow = ({ missionary, onView, onEdit, onDelete }: { missionary: M
             <div className="space-y-1">
                 <div className="flex items-center space-x-1">
                     <Mail className="w-3 h-3 text-gray-400" />
-                    <span className="text-sm text-gray-600 truncate max-w-32">{missionary.email}</span>
+                    <span className="text-sm text-gray-600 truncate max-w-32">{missionary.user?.email || 'No email'}</span>
                 </div>
                 <div className="flex items-center space-x-1">
                     <Phone className="w-3 h-3 text-gray-400" />
-                    <span className="text-sm text-gray-600">{missionary.phone}</span>
+                    <span className="text-sm text-gray-600">{missionary.phone || 'No phone'}</span>
                 </div>
                 {missionary.website && (
                     <div className="flex items-center space-x-1">

@@ -1,7 +1,7 @@
 'use client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { missionariesApi } from '@/lib/api/missionaries';
-import { Missionary, CreateMissionaryDto, UpdateMissionaryDto, DeleteResponse, QueryMissionaryDto } from '@/lib/types';
+import { Missionary, CreateMissionaryDto, UpdateMissionaryDto, QueryMissionaryDto } from '@/lib/types';
 import { toast } from 'sonner';
 
 export const missionariesQueryKeys = {
@@ -17,7 +17,7 @@ export const useGetMissionaries = (query?: QueryMissionaryDto) => {
     queryKey: [...missionariesQueryKeys.lists(), query ?? {}],
     queryFn: () => missionariesApi.getMissionaries(query),
     staleTime: 5 * 60 * 1000,
-    retry: (failureCount, error: any) => error?.status !== 401 && failureCount < 2,
+    retry: (failureCount, error: unknown) => (error as { status?: number })?.status !== 401 && failureCount < 2,
   });
 };
 
@@ -35,7 +35,7 @@ export const useCreateMissionary = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: CreateMissionaryDto) => missionariesApi.createMissionary(data),
-    onSuccess: (newMissionary) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: missionariesQueryKeys.lists() });
       toast.success('Missionary created successfully!');
     },

@@ -1,5 +1,5 @@
 import { Users, Target, Globe, Clock } from "lucide-react";
-import { Missionary } from "../types";
+import { Missionary } from "@/lib/types";
 
 interface StatsCardsProps {
   missionaries: Missionary[];
@@ -8,7 +8,10 @@ interface StatsCardsProps {
 export default function StatsCards({ missionaries }: StatsCardsProps) {
     const total = missionaries.length;
     const active = missionaries.filter(m => m.status === 'Active').length;
-    const locations = new Set(missionaries.map(m => m.location)).size;
+    const locations = new Set(missionaries.map(m => m.location).filter(Boolean)).size;
+    const avgExperience = missionaries.length > 0 
+      ? Math.round(missionaries.reduce((sum, m) => sum + (parseInt(m.years || '0') || 0), 0) / missionaries.length)
+      : 0;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
@@ -18,8 +21,8 @@ export default function StatsCards({ missionaries }: StatsCardsProps) {
       <StatCard icon={Target} label="Active" value={active} />
       {/* Locations */}
       <StatCard icon={Globe} label="Locations" value={locations} />
-      {/* Avg Experience (Hardcoded example) */}
-      <StatCard icon={Clock} label="Avg. Experience" value="7+ years" />
+      {/* Avg Experience */}
+      <StatCard icon={Clock} label="Avg. Experience" value={`${avgExperience} years`} />
     </div>
   );
 }

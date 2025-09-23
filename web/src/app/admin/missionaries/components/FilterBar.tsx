@@ -1,5 +1,5 @@
 import { Search, Download } from "lucide-react";
-import { Strategy } from "../types";
+import { Strategy } from "@/lib/types";
 
 interface FilterBarProps {
   filters: {

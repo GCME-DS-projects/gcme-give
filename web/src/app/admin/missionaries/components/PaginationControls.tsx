@@ -6,7 +6,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Pagination as PaginationType } from "../types";
+import { Pagination as PaginationType } from "@/lib/types";
 
 interface PaginationControlsProps {
   pagination: PaginationType;

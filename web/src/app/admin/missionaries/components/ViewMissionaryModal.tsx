@@ -1,4 +1,4 @@
-import { Missionary } from "../types";
+import { Missionary } from "@/lib/types";
 import { X, Mail, Phone, Globe, Heart, Calendar } from "lucide-react";
 
 interface ViewMissionaryModalProps {
@@ -15,11 +15,11 @@ export default function ViewMissionaryModal({ isOpen, onClose, missionary }: Vie
       <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b flex justify-between items-start">
           <div className="flex items-center space-x-4">
-            <img src={missionary.image || '/placeholder-user.jpg'} alt={missionary.name} className="w-16 h-16 rounded-full object-cover" />
+            <img src={missionary.user?.image || missionary.image || '/placeholder-user.jpg'} alt={missionary.user?.name || 'Unknown'} className="w-16 h-16 rounded-full object-cover" />
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">{missionary.name}</h3>
-              <p className="text-lg text-gray-600">{missionary.title}</p>
-              <p className="text-sm text-gray-500">{missionary.location}</p>
+              <h3 className="text-2xl font-bold text-gray-900">{missionary.user?.name || 'Unknown'}</h3>
+              <p className="text-lg text-gray-600">{missionary.title || 'No title'}</p>
+              <p className="text-sm text-gray-500">{missionary.location || 'No location'}</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">

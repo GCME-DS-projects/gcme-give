@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/auth/:path*",
-        destination: `${process.env.API_URL}/api/auth/:path*`,
+        destination: `${process.env.API_URL || 'http://localhost:3000'}/api/auth/:path*`,
       },
     ];
   }
