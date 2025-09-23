@@ -78,8 +78,9 @@ CREATE TABLE "public"."verification" (
 -- CreateTable
 CREATE TABLE "public"."Missionary" (
     "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "userId" TEXT,
     "title" TEXT,
+    "imageUrl" TEXT,
     "phone" TEXT,
     "shortBio" TEXT,
     "fullBio" TEXT,
@@ -116,7 +117,7 @@ CREATE TABLE "public"."Projects" (
     "title" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "shortDescription" TEXT NOT NULL,
-    "image" BYTEA,
+    "image" TEXT,
     "category" TEXT,
     "location" TEXT,
     "duration" TEXT,
@@ -289,9 +290,6 @@ ALTER TABLE "public"."account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE "public"."Missionary" ADD CONSTRAINT "Missionary_strategyId_fkey" FOREIGN KEY ("strategyId") REFERENCES "public"."Strategy"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."Missionary" ADD CONSTRAINT "Missionary_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."Projects" ADD CONSTRAINT "Projects_strategyId_fkey" FOREIGN KEY ("strategyId") REFERENCES "public"."Strategy"("id") ON DELETE SET NULL ON UPDATE CASCADE;

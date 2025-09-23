@@ -54,8 +54,6 @@ export class StrategiesController {
     if (!file) throw new BadRequestException('No file uploaded');
 
     const imagePath = await this.fileUploadService.upload(file, session.user.id, 'strategy', 'strategy');
-    console.log('Image uploaded to path:', imagePath);
-    console.log("image url:", this.fileUploadService.getMediaUrl(imagePath));
 
     return {
       imageUrl: this.fileUploadService.getMediaUrl(imagePath),

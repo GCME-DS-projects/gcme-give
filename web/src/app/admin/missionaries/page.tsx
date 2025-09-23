@@ -1,204 +1,143 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Loader2 } from "lucide-react";
-import { Missionary, Strategy, Pagination, QueryMissionaryDto, CreateMissionaryDto, UpdateMissionaryDto } from "@/lib/types";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useGetMissionaries, useRemoveMissionary } from "@/hooks/queries/use-missionaries-query";
+import { useGetStrategies } from "@/hooks/queries/use-strategies-query"; // Assuming this exists from previous refactor
+import { Loader2, Plus, Search } from "lucide-react";
+import { Missionary, QueryMissionaryDto } from "@/lib/types";
+import { useDebounce } from "@/hooks/use-debounce";
+import { MissionariesStats } from "@/components/admin/missionaries/missionaries-stats";
+import { MissionariesTable } from "@/components/admin/missionaries/missionaries-table";
+import { AddMissionaryDialog } from "@/components/admin/missionaries/add-missionary-dialog";
+import { EditMissionaryDialog } from "@/components/admin/missionaries/edit-missionary-dialog";
+import { ViewMissionaryModal } from "@/components/admin/missionaries/view-missionary-modal";
+import { DeleteMissionaryAlert } from "@/components/admin/missionaries/delete-missionary-alert";
 
-// Import React Query hooks
-import { 
-  useGetMissionaries, 
-  useCreateMissionary, 
-  useUpdateMissionary, 
-  useRemoveMissionary 
-} from "@/hooks/queries/use-missionaries-query";
-
-// Import the new components
-import PageHeader from "./components/PageHeader";
-import StatsCards from "./components/StatsCards";
-import FilterBar from "./components/FilterBar";
-import MissionariesTable from "./components/MissionariesTable";
-import PaginationControls from "./components/PaginationControls";
-import MissionaryFormModal from "./components/MissionaryFormModal";
-import ViewMissionaryModal from "./components/ViewMissionaryModal";
-import DeleteConfirmationModal from "./components/DeleteConfirmationModal";
-
-export const dynamic = 'force-dynamic';
-
-type ModalType = 'add' | 'edit' | 'view' | 'delete';
-
-export default function AdminMissionariesPage() {
-  const [strategies, setStrategies] = useState<Strategy[]>([]);
-  const [pagination, setPagination] = useState<Pagination>({ page: 1, limit: 10, total: 0, pages: 1 });
-  
-  // State for filters
-  const [filters, setFilters] = useState({
-    search: "",
-    status: "all",
-    type: "all",
-    strategy: "all",
+export default function MissionariesPage() {
+  const [query, setQuery] = useState<QueryMissionaryDto>({});
+  const [dialogs, setDialogs] = useState({
+    add: false,
+    edit: null as Missionary | null,
+    view: null as Missionary | null,
+    delete: null as Missionary | null,
   });
 
-  // State for modals
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<ModalType | null>(null);
-  const [selectedMissionary, setSelectedMissionary] = useState<Missionary | null>(null);
+  const debouncedSearch = useDebounce(query.search, 500);
 
-  // Build query parameters for API
-  const queryParams: QueryMissionaryDto = {
-    page: pagination.page,
-    limit: pagination.limit,
-    ...(filters.search && { search: filters.search }),
-    ...(filters.status !== "all" && { status: filters.status }),
-    ...(filters.type !== "all" && { type: filters.type }),
-    ...(filters.strategy !== "all" && { strategyId: filters.strategy }),
-  };
+  const { data: missionaries = [], isLoading: isLoadingMissionaries } = useGetMissionaries({ ...query, search: debouncedSearch });
+  const { data: strategies = [], isLoading: isLoadingStrategies } = useGetStrategies();
+  const { mutate: removeMissionary, isPending: isDeleting } = useRemoveMissionary();
 
-  // Use React Query hooks
-  const { data: missionaries = [], isLoading, error } = useGetMissionaries(queryParams);
-  const createMissionaryMutation = useCreateMissionary();
-  const updateMissionaryMutation = useUpdateMissionary();
-  const deleteMissionaryMutation = useRemoveMissionary();
-
-  // Fetch strategies (keeping this as manual fetch for now since we don't have strategies hooks yet)
-  useEffect(() => {
-    const fetchStrategies = async () => {
-      try {
-        const res = await fetch("/api/admin/strategies");
-        const data = await res.json();
-        setStrategies(Array.isArray(data) ? data : data.strategies || []);
-      } catch (e) {
-        console.error("Failed to fetch strategies:", e);
-        setStrategies([]);
-      }
-    };
-    fetchStrategies();
-  }, []);
-
-  // Modal handlers
-  const openModal = (type: ModalType, missionary: Missionary | null = null) => {
-    setModalType(type);
-    setSelectedMissionary(missionary);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setModalType(null);
-    setSelectedMissionary(null);
+  const handleQueryChange = (key: keyof QueryMissionaryDto, value: string) => {
+    setQuery(prev => ({ ...prev, [key]: value === 'all' ? undefined : value }));
   };
   
-  // CRUD handlers
-  const handleSave = async (formData: FormData, missionaryId?: string) => {
-    const isEdit = !!missionaryId;
-    
-    try {
-      if (isEdit) {
-        // Convert FormData to UpdateMissionaryDto
-        const updateData: UpdateMissionaryDto = {};
-        for (const [key, value] of formData.entries()) {
-          if (key === 'supportNeeds' || key === 'recentUpdates') {
-            updateData[key as keyof UpdateMissionaryDto] = JSON.parse(value as string);
-          } else if (key !== 'image') {
-            updateData[key as keyof UpdateMissionaryDto] = value as string;
-          }
-        }
-        await updateMissionaryMutation.mutateAsync({ id: missionaryId, data: updateData });
-      } else {
-        // Convert FormData to CreateMissionaryDto
-        const createData: CreateMissionaryDto = {
-          userId: 'temp-user-id', // This should be set from the current user context
-          ...Object.fromEntries(formData.entries()) as Partial<CreateMissionaryDto>
-        };
-        
-        // Handle special fields
-        for (const [key, value] of formData.entries()) {
-          if (key === 'supportNeeds' || key === 'recentUpdates') {
-            createData[key as keyof CreateMissionaryDto] = JSON.parse(value as string);
-          } else if (key === 'imageUrl') {
-            createData.imageUrl = value as string;
-          } else if (key !== 'image') {
-            createData[key as keyof CreateMissionaryDto] = value as string;
-          }
-        }
-        
-        await createMissionaryMutation.mutateAsync(createData);
-      }
-      closeModal();
-    } catch (error) {
-      console.error(error);
-      // Error handling is done by the mutation hooks with toast notifications
+  const handleConfirmDelete = () => {
+    if (dialogs.delete) {
+      removeMissionary(dialogs.delete.id, {
+        onSuccess: () => setDialogs(prev => ({ ...prev, delete: null })),
+      });
     }
   };
   
-  const handleDelete = async () => {
-    if (!selectedMissionary) return;
-    try {
-      await deleteMissionaryMutation.mutateAsync(selectedMissionary.id);
-      closeModal();
-    } catch (error) {
-      console.error(error);
-      // Error handling is done by the mutation hooks with toast notifications
-    }
-  };
-
-  const handlePageChange = (newPage: number) => {
-    setPagination((p: Pagination) => ({ ...p, page: newPage }));
-  };
+  const isLoading = isLoadingMissionaries || isLoadingStrategies;
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
-      <PageHeader onAddClick={() => openModal('add')} />
-      <StatsCards missionaries={missionaries} />
-      <FilterBar filters={filters} onFiltersChange={setFilters} strategies={strategies} />
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Missionaries Management</h1>
+          <p className="text-gray-600 mt-2">Manage missionary profiles, information, and ministry assignments.</p>
+        </div>
+        <Button onClick={() => setDialogs(prev => ({ ...prev, add: true }))}>
+          <Plus className="w-5 h-5 mr-2" />
+          Add Missionary
+        </Button>
+      </div>
+
+      <MissionariesStats missionaries={missionaries} />
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <Input
+              placeholder="Search by name..."
+              value={query.search || ''}
+              onChange={(e) => handleQueryChange('search', e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Select value={query.status || 'all'} onValueChange={(v) => handleQueryChange('status', v)}>
+            <SelectTrigger><SelectValue placeholder="Filter by status" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="Active">Active</SelectItem>
+              <SelectItem value="Inactive">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
+           <Select value={query.type || 'all'} onValueChange={(v) => handleQueryChange('type', v)}>
+            <SelectTrigger><SelectValue placeholder="Filter by type" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="Full-time">Full-time</SelectItem>
+              <SelectItem value="Part-time">Part-time</SelectItem>
+            </SelectContent>
+          </Select>
+           <Select value={query.region || 'all'} onValueChange={(v) => handleQueryChange('region', v)}>
+            <SelectTrigger><SelectValue placeholder="Filter by region" /></SelectTrigger>
+            <SelectContent>
+                <SelectItem value="all">All Regions</SelectItem>
+                <SelectItem value="Addis Ababa">Addis Ababa</SelectItem>
+                {/* Add other regions as needed */}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
       
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto relative">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-auto">
         {isLoading ? (
-          <div className="flex justify-center items-center p-8">
-            <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
-          </div>
-        ) : error ? (
-          <div className="flex justify-center items-center p-8">
-            <div className="text-red-600">Error loading missionaries: {(error as Error).message}</div>
-          </div>
+            <div className="flex justify-center items-center p-8"><Loader2 className="w-6 h-6 animate-spin text-blue-600" /></div>
         ) : (
-          <MissionariesTable
-            missionaries={missionaries}
-            onView={(m) => openModal('view', m)}
-            onEdit={(m) => openModal('edit', m)}
-            onDelete={(m) => openModal('delete', m)}
-          />
+            <MissionariesTable
+                missionaries={missionaries}
+                onEdit={(m) => setDialogs(prev => ({ ...prev, edit: m }))}
+                onView={(m) => setDialogs(prev => ({ ...prev, view: m }))}
+                onDelete={(m) => setDialogs(prev => ({ ...prev, delete: m }))}
+            />
         )}
       </div>
 
-      {!isLoading && !error && missionaries.length > 0 && (
-        <PaginationControls pagination={pagination} onPageChange={handlePageChange} />
-      )}
-      
-      {/* Modals */}
-      {(modalType === 'add' || modalType === 'edit') && (
-        <MissionaryFormModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onSave={handleSave}
-          missionary={selectedMissionary}
+      {/* Dialogs and Modals */}
+      <AddMissionaryDialog
+        isOpen={dialogs.add}
+        onOpenChange={(isOpen) => setDialogs(prev => ({ ...prev, add: isOpen }))}
+        strategies={strategies}
+      />
+      {dialogs.edit && (
+        <EditMissionaryDialog
+          missionary={dialogs.edit}
+          isOpen={!!dialogs.edit}
+          onOpenChange={(isOpen) => setDialogs(prev => ({ ...prev, edit: isOpen ? dialogs.edit : null }))}
           strategies={strategies}
         />
       )}
-
-      {modalType === 'view' && selectedMissionary && (
+      {dialogs.view && (
         <ViewMissionaryModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          missionary={selectedMissionary}
+          missionary={dialogs.view}
+          isOpen={!!dialogs.view}
+          onOpenChange={(isOpen) => setDialogs(prev => ({ ...prev, view: isOpen ? dialogs.view : null }))}
         />
       )}
-      
-      {modalType === 'delete' && selectedMissionary && (
-        <DeleteConfirmationModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          onConfirm={handleDelete}
-          missionaryName={selectedMissionary.user?.name || 'Unknown'}
+      {dialogs.delete && (
+        <DeleteMissionaryAlert
+          isOpen={!!dialogs.delete}
+          onOpenChange={(isOpen) => setDialogs(prev => ({ ...prev, delete: isOpen ? dialogs.delete : null }))}
+          onConfirmDelete={handleConfirmDelete}
+          isDeleting={isDeleting}
         />
       )}
     </div>

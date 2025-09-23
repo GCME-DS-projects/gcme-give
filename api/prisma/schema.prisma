@@ -24,7 +24,6 @@ model User {
   sessions      Session[]
   accounts      Account[]
   roles         UserRole[]
-  missionary    Missionary?
 
   @@map("user")
   @@index([email])
@@ -91,8 +90,9 @@ model Verification {
 
 model Missionary {
   id                String     @id @default(uuid())
-  userId            String     @unique
+  userId            String?     @unique
   title             String?
+  imageUrl          String?
   phone             String?
   shortBio          String?
   fullBio           String?
@@ -122,7 +122,6 @@ model Missionary {
 
   Strategy          Strategy?      @relation(fields: [strategyId], references: [id])
   contributions     Contribution[]
-  user              User           @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([strategyId])

@@ -8,28 +8,16 @@ import { QueryMissionaryDto } from './dto/query-missionary.dto';
 export class MissionariesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(dto: CreateMissionaryDto, imageUrl?: string) {
-    // Start a transaction to create missionary and update user
-    return this.prisma.$transaction(async (tx) => {
-      const missionary = await tx.missionary.create({
-        data: {
-          ...dto
-        },
-      });
-
-      if (imageUrl) {
-        await tx.user.update({
-          where: { id: dto.userId },
-          data: { image: imageUrl },
-        });
-      }
-
-      return missionary;
+  async create(dto: CreateMissionaryDto) {
+    const missionary = await this.prisma.missionary.create({
+      data: { ...dto },
     });
+    return missionary;
   }
 
   async findAll(query: QueryMissionaryDto) {
     const { search, status, type, role, region } = query;
+
     return this.prisma.missionary.findMany({
       where: {
         isDeleted: false,
@@ -46,29 +34,32 @@ export class MissionariesService {
           ],
         }),
       },
-      include: {
-        user: true, // include user record
-      },
     });
   }
 
   async findOne(id: string) {
-    const missionary = await this.prisma.missionary.findUnique({
-      where: { id },
-      include: { user: true }, // include user record
-    });
+    const missionary = await this.prisma.missionary.findUnique({ where: { id } });
     if (!missionary) throw new NotFoundException(`Missionary with id ${id} not found`);
     return missionary;
   }
 
-
   async update(id: string, dto: UpdateMissionaryDto) {
-    await this.findOne(id);
-    return this.prisma.missionary.update({ where: { id }, data: dto });
+    const missionary = await this.prisma.missionary.findUnique({ where: { id } });
+    if (!missionary) throw new NotFoundException(`Missionary with id ${id} not found`);
+
+    return this.prisma.missionary.update({
+      where: { id },
+      data: { ...dto },
+    });
   }
 
   async remove(id: string) {
-    await this.findOne(id);
-    return this.prisma.missionary.update({ where: { id }, data: { isDeleted: true } });
+    const missionary = await this.prisma.missionary.findUnique({ where: { id } });
+    if (!missionary) throw new NotFoundException(`Missionary with id ${id} not found`);
+
+    return this.prisma.missionary.update({
+      where: { id },
+      data: { isDeleted: true },
+    });
   }
 }

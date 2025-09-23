@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, UseInterceptors, UploadedFile, BadRequestException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseInterceptors, UploadedFile, BadRequestException, UseGuards } from '@nestjs/common';
 import { MissionariesService } from './missionaries.service';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
@@ -16,23 +16,36 @@ export class MissionariesController {
 
   @Post()
   @UseGuards(nestjsBetterAuth.AuthGuard)
-  create(@Body() dto: CreateMissionaryDto) {
+  async create(
+    @Body() dto: CreateMissionaryDto,
+    @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession
+  ) {
+    // dto.userId = session.user.id;
     return this.missionariesService.create(dto);
   }
 
   @Post('upload/image')
   @UseGuards(nestjsBetterAuth.AuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadMissionaryImage(
-    @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession,
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(
     @UploadedFile() file: Express.Multer.File,
+    @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession
   ) {
+    if (!session?.user?.id) {
+      console.error('User session not found or invalid:', session);
+      throw new BadRequestException('User session not found. Please login.');
+    }
+
+    console.log('Uploaded file:', file);
     if (!file) throw new BadRequestException('No file uploaded');
 
-    // Upload image using FileUploadService
-    const filePath = await this.fileUploadService.upload(file, session.user.id, 'missionary', 'missionary', true);
+    const imagePath = await this.fileUploadService.upload(file, session.user.id, 'missionary', 'missionary');
+    console.log('Image uploaded to path:', imagePath);
+    console.log("image url:", this.fileUploadService.getMediaUrl(imagePath));
 
-    return { imageUrl: this.fileUploadService.getMediaUrl(filePath) };
+    return {
+      imageUrl: this.fileUploadService.getMediaUrl(imagePath),
+    };
   }
 
   @Get()
@@ -45,7 +58,7 @@ export class MissionariesController {
     return this.missionariesService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() dto: UpdateMissionaryDto) {
     return this.missionariesService.update(id, dto);
   }

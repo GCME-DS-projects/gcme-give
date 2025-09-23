@@ -32,9 +32,7 @@ export default function AdminProjectsPage() {
   const handleConfirmDelete = () => {
     if (deletingProject) {
       deleteProject(deletingProject.id, {
-        onSuccess: () => {
-          setDeletingProject(null);
-        },
+        onSuccess: () => setDeletingProject(null),
       });
     }
   };

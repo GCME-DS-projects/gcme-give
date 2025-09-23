@@ -1,3 +1,10 @@
+// Define the shape of a single support need object
+export interface SupportNeed {
+  item: string;
+  amount: number;
+  description?: string;
+}
+
 export interface Missionary {
   id: string;
   userId: string;
@@ -5,6 +12,8 @@ export interface Missionary {
   phone?: string;
   shortBio?: string;
   fullBio?: string;
+  imageUrl?: string;
+  email?: string;
   location?: string;
   qualification?: string;
   website?: string;
@@ -15,7 +24,7 @@ export interface Missionary {
   status?: string;
   prayerRequests?: string[];
   recentUpdates?: any;
-  supportNeeds?: any;
+  supportNeeds?: SupportNeed[]; // FIX: Changed from 'any' to 'SupportNeed[]'
   type?: string;
   role?: string;
   strategyId?: string;
@@ -38,8 +47,9 @@ export interface User {
   image?: string;
 }
 
+// --- DTOs remain the same ---
+
 export interface CreateMissionaryDto {
-  userId: string;
   imageUrl?: string;
   title?: string;
   phone?: string;

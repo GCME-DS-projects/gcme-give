@@ -68,12 +68,12 @@ export const useUpdateProjectMutation = (id: string) => {
   });
 };
 
-export const useDeleteProjectMutation = (id: string) => {
+export const useDeleteProjectMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => ProjectsApi.deleteProject(id),
-    onSuccess: () => {
+    mutationFn: (id: string) => ProjectsApi.deleteProject(id),
+    onSuccess: (_data, id: string) => {
       queryClient.setQueryData<Project[]>(
         projectsQueryKeys.lists(),
         (oldData) => (oldData ? oldData.filter((p) => p.id !== id) : [])
@@ -85,3 +85,4 @@ export const useDeleteProjectMutation = (id: string) => {
     },
   });
 };
+

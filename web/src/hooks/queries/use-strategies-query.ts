@@ -1,7 +1,6 @@
 import { api } from "@/lib/api";
 import { Strategy } from "@/lib/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { on } from "events";
 import { toast } from "sonner";
 
 
@@ -71,26 +70,26 @@ export const useUpdateStrategyMutation = (id: string) => {
   });
 }
 
-export const useDeleteStrategyMutation = (id: string) => {
+export const useDeleteStrategyMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => api.strategies.deleteStrategy(id),
-    onSuccess: () => {
-      // Remove the deleted strategy from the cache
-      queryClient.setQueryData<Strategy[]>(strategiesQueryKeys.lists(), (oldData) => {
-        return oldData ? oldData.filter(strategy => strategy.id !== id) : [];
-      });
-      
-      // Remove the individual strategy cache if it exists
+    mutationFn: (id: string) => api.strategies.deleteStrategy(id),
+    onSuccess: (_data, id: string) => {
+      queryClient.setQueryData<Strategy[]>(strategiesQueryKeys.lists(), (oldData) =>
+        oldData ? oldData.filter((s) => s.id !== id) : []
+      );
+
       queryClient.removeQueries({ queryKey: [...strategiesQueryKeys.all, id] });
-      toast.success('Strategy deleted successfully!');
+
+      toast.success("Strategy deleted successfully!");
     },
     onError: (error: Error) => {
-      toast.error(error.message || 'Error deleting strategy');
+      toast.error(error.message || "Error deleting strategy");
     },
   });
-}
+};
+
 
 export const useUploadStrategyImageMutation = () => {
   return useMutation({

@@ -6,7 +6,7 @@ export class CreateMissionaryDto {
   imageUrl?: string;
   
   @IsUUID()
-  userId: string;
+  userId?: string;
 
   @IsOptional() 
   @IsString() 

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MediaUpload } from "@/components/admin/strategies/MediaUpload";
+import { MediaUpload } from "@/components/admin/strategies/media-upload";
 import { Strategy } from "@/lib/types";
 import { Loader2, Plus, X } from "lucide-react";
 

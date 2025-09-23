@@ -24,9 +24,7 @@ export default function StrategiesPage() {
   const handleConfirmDelete = () => {
     if (deletingStrategy) {
       deleteStrategy(deletingStrategy.id, {
-        onSuccess: () => {
-          setDeletingStrategy(null);
-        },
+        onSuccess: () => setDeletingStrategy(null),
       });
     }
   };
