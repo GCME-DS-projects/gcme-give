@@ -10,6 +10,7 @@ import { MapPin, Calendar, Search, Users, Globe, Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Missionary } from "@/lib/types";
+// FIX: Corrected import paths for consistency
 import Header from "@/components/public/common/header";
 import Footer from "@/components/public/common/footer";
 import DonationModal from "@/components/public/landing/donation-modal";
@@ -29,11 +30,11 @@ export default function MissionariesPage() {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   // --- Data Fetching with React Query ---
-  const { 
-    data: missionaries = [], 
-    isLoading, 
+  const {
+    data: missionaries = [],
+    isLoading,
     isError,
-    error 
+    error,
   } = useGetMissionaries({ search: debouncedSearchTerm });
 
   const [donationModal, setDonationModal] = useState<{
@@ -53,14 +54,16 @@ export default function MissionariesPage() {
       isOpen: true,
       type: "missionary",
       title: missionary.user?.name || "Missionary",
-      description: missionary.mission || `Support the ministry of ${missionary.user?.name}.`,
+      description:
+        missionary.mission ||
+        `Support the ministry of ${missionary.user?.name}.`,
     });
   };
 
   const closeDonationModal = () => {
     setDonationModal({ ...donationModal, isOpen: false });
   };
-  
+
   // --- Impact stats are now calculated with useMemo for efficiency ---
   const impactStats = useMemo(() => {
     if (!missionaries || missionaries.length === 0) {
@@ -73,7 +76,9 @@ export default function MissionariesPage() {
     return [
       {
         label: "Active Missionaries",
-        value: missionaries.filter((m) => m.status === "Active").length.toString(),
+        value: missionaries
+          .filter((m) => m.status === "Active")
+          .length.toString(),
         icon: Users,
       },
       {
@@ -92,7 +97,6 @@ export default function MissionariesPage() {
     ];
   }, [missionaries]);
 
-
   const renderContent = () => {
     if (isLoading) {
       return (
@@ -103,24 +107,28 @@ export default function MissionariesPage() {
     }
 
     if (isError) {
+      // FIX: Safely check for the error message
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to load missionaries.";
+
       return (
         <div className="text-center min-h-[400px] flex flex-col justify-center items-center">
-          <p className="text-lg text-red-600 mb-4">
-            {error?.message || "Failed to load missionaries."}
-          </p>
+          <p className="text-lg text-red-600 mb-4">{errorMessage}</p>
           <Button onClick={() => window.location.reload()}>Try Again</Button>
         </div>
       );
     }
-    
+
     if (missionaries.length === 0) {
-        return (
-            <div className="text-center min-h-[400px] flex flex-col justify-center items-center">
-                <p className="text-lg text-stone-600">
-                    No missionaries found matching your search.
-                </p>
-            </div>
-        );
+      return (
+        <div className="text-center min-h-[400px] flex flex-col justify-center items-center">
+          <p className="text-lg text-stone-600">
+            No missionaries found matching your search.
+          </p>
+        </div>
+      );
     }
 
     return (
@@ -200,7 +208,8 @@ export default function MissionariesPage() {
                 Our Ethiopian Missionaries
               </h1>
               <p className="text-xl text-stone-600 max-w-3xl mx-auto">
-                Meet the dedicated individuals serving communities across Ethiopia, spreading hope, love, and transformation.
+                Meet the dedicated individuals serving communities across
+                Ethiopia, spreading hope, love, and transformation.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
@@ -240,22 +249,20 @@ export default function MissionariesPage() {
         </section>
 
         <section className="py-12">
-          <div className="container mx-auto px-4">
-             {renderContent()}
-          </div>
-        </section>
-        
-        <section className="py-16 bg-primary-600">
-           <div className="container mx-auto px-4 text-center">
-             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-               Support Our Ethiopian Missionaries
-             </h2>
-             <p className="text-xl text-amber-100 mb-8 max-w-2xl mx-auto">
-               Your partnership enables these faithful servants to continue their vital work.
-             </p>
-           </div>
+          <div className="container mx-auto px-4">{renderContent()}</div>
         </section>
 
+        <section className="py-16 bg-primary-600">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Support Our Ethiopian Missionaries
+            </h2>
+            <p className="text-xl text-amber-100 mb-8 max-w-2xl mx-auto">
+              Your partnership enables these faithful servants to continue their
+              vital work.
+            </p>
+          </div>
+        </section>
       </div>
       <Footer />
       <DonationModal
