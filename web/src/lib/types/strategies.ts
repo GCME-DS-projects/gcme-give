@@ -5,7 +5,7 @@ export type Strategy = {
   fullDescription: string;
   slug: string;
   icon?: string;
-  imagePath?: string; // This could be a URL or a base64 string
+  imagePath?: string; 
   activities: string[];
   visionText?: string;
   involvedText?: string;
