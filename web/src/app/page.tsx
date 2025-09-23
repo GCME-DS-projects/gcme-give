@@ -279,13 +279,13 @@ export default function MissionaryDonationPlatform() {
       </section>
 
       {/* Projects Section */}
-      <ProjectsSection
-        projects={projects}
-        openDonationModal={openDonationModal}
-      />
+      <ProjectsSection openDonationModal={openDonationModal} />
+
+
 
       {/* Strategies Section */}
-      <StrategiesSection openDonationModal={openDonationModal} />
+      <MissionariesSection />
+
 
       {/* Missionaries Section */}
       <MissionariesSection />
