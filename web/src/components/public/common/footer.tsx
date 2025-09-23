@@ -51,14 +51,6 @@ export default function Footer() {
                   Fund Projects
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/prayer-requests"
-                  className="hover:text-primary-300 transition-colors"
-                >
-                  Prayer Requests
-                </Link>
-              </li>
             </ul>
           </div>
           <div>
@@ -80,22 +72,6 @@ export default function Footer() {
                   Our Impact
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/transparency"
-                  className="hover:text-primary-300 transition-colors"
-                >
-                  Financial Transparency
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="hover:text-primary-300 transition-colors"
-                >
-                  Contact Us
-                </Link>
-              </li>
             </ul>
           </div>
           <div>
@@ -113,14 +89,6 @@ export default function Footer() {
               <li className="flex items-center">
                 <Phone className="w-4 h-4 mr-2" />
                 <span>+251 11 555 0123</span>
-              </li>
-              <li>
-                <Link
-                  href="/newsletter"
-                  className="hover:text-primary-300 transition-colors"
-                >
-                  Newsletter Signup
-                </Link>
               </li>
             </ul>
           </div>

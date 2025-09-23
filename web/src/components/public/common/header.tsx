@@ -13,7 +13,6 @@ export default function Header({ currentPage }: HeaderProps) {
     { href: "/strategies", label: "Strategies" },
     { href: "/missionaries", label: "Missionaries" },
     { href: "/about", label: "About" },
-    { href: "/contact", label: "Contact" },
   ];
 
   return (
