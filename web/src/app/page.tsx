@@ -287,9 +287,6 @@ export default function MissionaryDonationPlatform() {
       <MissionariesSection />
 
 
-      {/* Missionaries Section */}
-      <MissionariesSection />
-
       {/* Call to Action */}
       <section className="py-16 bg-gradient-to-r from-[#102C80] to-[#0E276E]">
         <div className="container mx-auto px-4 text-center">
