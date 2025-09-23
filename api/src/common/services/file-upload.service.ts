@@ -15,7 +15,7 @@ export class FileUploadService {
     video: 50 * 1024 * 1024,
     resume: 5 * 1024 * 1024,
   };
-  private readonly categories = ['avatars', 'posts', 'company-logo', 'resumes', 'chat'] as const;
+  private readonly categories = ['strategy', 'missionary', 'projects'] as const;
 
   constructor() {
     this.ensureDirectories();
@@ -41,19 +41,10 @@ export class FileUploadService {
     }
   }
 
-  private validateFile(file: Express.Multer.File, type: 'avatar' | 'image' | 'video' | 'resume' = 'avatar') {
+  private validateFile(file: Express.Multer.File, type: 'strategy' | 'missionary' | 'projects') {
     if (!file) throw new BadRequestException('File not provided');
 
-    const allowedTypes = type === 'video' ? this.allowedVideoMimeTypes : this.allowedImageMimeTypes;
-    const maxSize = this.maxSizes[type];
-
-    if (file.size > maxSize) throw new BadRequestException(`File size exceeds ${maxSize / 1024 / 1024}MB`);
-    if (type !== 'resume' && !allowedTypes.includes(file.mimetype)) {
-      throw new BadRequestException(`Invalid file type. Allowed: ${allowedTypes.join(', ')}`);
-    }
-    if (type === 'resume' && file.mimetype !== 'application/pdf') {
-      throw new BadRequestException('Resume must be PDF');
-    }
+    //to be done
   }
 
   private async saveFile(buffer: Buffer, folderPath: string, fileName: string) {
@@ -83,12 +74,11 @@ export class FileUploadService {
     if (filePath.startsWith('http')) return filePath;
 
     const baseUrl = process.env.API_BASE_URL || 'http://localhost:3001';
-    const apiPrefix = process.env.API_PREFIX || 'api/v1';
-    return `${baseUrl}/${apiPrefix}${filePath.startsWith('/') ? '' : '/'}${filePath}`;
+    return `${baseUrl}${filePath}`;
   }
 
   // Generic upload method
-  private async upload(
+  async upload(
     file: Express.Multer.File,
     userId: string,
     category: typeof this.categories[number],
@@ -96,8 +86,7 @@ export class FileUploadService {
     optimize = false,
   ): Promise<string> {
     try {
-      this.validateFile(file, optimize ? 'image' : category === 'posts' ? 'video' : 'avatar');
-
+      
       const userPath = await this.ensureUserDirectory(category, userId);
       const buffer = optimize ? await this.optimizeImage(file.buffer) : file.buffer;
       const fileName = this.generateFileName(prefix, file.originalname);
@@ -110,31 +99,6 @@ export class FileUploadService {
     }
   }
 
-  // Public upload methods
-  uploadAvatar(file: Express.Multer.File, userId: string) {
-    return this.upload(file, userId, 'avatars', 'avatar', true);
-  }
-
-  uploadPostImage(file: Express.Multer.File, userId: string) {
-    return this.upload(file, userId, 'posts', 'post');
-  }
-
-  uploadPostVideo(file: Express.Multer.File, userId: string) {
-    return this.upload(file, userId, 'posts', 'post');
-  }
-
-  uploadCompanyLogo(file: Express.Multer.File, userId: string) {
-    return this.upload(file, userId, 'company-logo', 'logo');
-  }
-
-  uploadResume(file: Express.Multer.File, userId: string) {
-    return this.upload(file, userId, 'resumes', 'resume');
-  }
-
-  uploadChatAttachment(file: Express.Multer.File, userId: string) {
-    return this.upload(file, userId, 'chat', 'attachment');
-  }
-
   async deleteFile(filePath: string) {
     try {
       if (!filePath) return;
@@ -145,11 +109,7 @@ export class FileUploadService {
     } catch {}
   }
 
-  getAvatarUrl(filePath: string) {
-    return this.buildUrl(filePath);
-  }
-
-  getPostMediaUrl(filePath: string) {
+  getMediaUrl(filePath: string) {
     return this.buildUrl(filePath);
   }
 }

@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.API_URL || "http://localhost:3000";
+const API_BASE_URL = process.env.API_URL || "http://localhost:3001";
 
 export class BaseApiClient {
   private baseURL: string;
@@ -82,32 +82,25 @@ export class BaseApiClient {
     return this.request<T>(endpoint, { method: "DELETE", ...options });
   }
 
-  private getAccessToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('accessToken');
-  }
+
 
   public async upload<T>(endpoint: string, formData: FormData, options?: RequestInit): Promise<T> {
-    const token = this.getAccessToken();
-    
     const config: RequestInit = {
       method: 'POST',
       body: formData,
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...options?.headers,
-      },
-      credentials: 'include',
+      credentials: 'include', // ensure cookies are sent
       ...options,
     };
 
-    // Не устанавливаем Content-Type для FormData
-    delete (config.headers as any)['Content-Type'];
-
     const response = await fetch(`${this.baseURL}${endpoint}`, config);
+
+    if (!response.ok) {
+      throw new Error(`Upload failed: ${response.status}`);
+    }
 
     return await response.json();
   }
+
 }
 
 export const apiClient = new BaseApiClient();

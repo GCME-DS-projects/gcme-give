@@ -1,11 +1,18 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, Put, UseInterceptors, UploadedFile, BadRequestException, UseGuards } from '@nestjs/common';
 import { StrategiesService } from './strategies.service';
 import { CreateStrategyDto } from './dto/create-strategy.dto';
 import { UpdateStrategyDto } from './dto/update-strategy.dto';
+import { FileUploadService } from '../../common/services/file-upload.service';
+import { FileInterceptor } from '@nestjs/platform-express';
+import * as nestjsBetterAuth from '@thallesp/nestjs-better-auth';
+import { s } from 'node_modules/better-auth/dist/shared/better-auth.7zTmTxT4.cjs';
 
 @Controller('strategies')
 export class StrategiesController {
-  constructor(private readonly strategiesService: StrategiesService) {}
+  constructor(
+    private readonly strategiesService: StrategiesService,
+    private readonly fileUploadService: FileUploadService,
+  ) {}
 
   @Post()
   create(@Body() dto: CreateStrategyDto) {
@@ -22,7 +29,7 @@ export class StrategiesController {
     return this.strategiesService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() dto: UpdateStrategyDto) {
     return this.strategiesService.update(id, dto);
   }
@@ -31,4 +38,29 @@ export class StrategiesController {
   remove(@Param('id') id: string) {
     return this.strategiesService.remove(id);
   }
+
+ @Post('upload/image')
+ @UseGuards(nestjsBetterAuth.AuthGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession
+  ) {
+    if (!session?.user?.id) {
+      console.error('User session not found or invalid:', session);
+      throw new BadRequestException('User session not found. Please login.');
+    }
+
+    console.log('Uploaded file:', file);
+    if (!file) throw new BadRequestException('No file uploaded');
+
+    const imagePath = await this.fileUploadService.upload(file, session.user.id, 'strategy', 'strategy');
+    console.log('Image uploaded to path:', imagePath);
+    console.log("image url:", this.fileUploadService.getMediaUrl(imagePath));
+
+    return {
+      imageUrl: this.fileUploadService.getMediaUrl(imagePath),
+    };
+  }
+
 }

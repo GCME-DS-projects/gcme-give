@@ -30,9 +30,9 @@ export class MissionariesController {
     if (!file) throw new BadRequestException('No file uploaded');
 
     // Upload image using FileUploadService
-    const filePath = await this.fileUploadService.uploadAvatar(file, session.user.id);
+    const filePath = await this.fileUploadService.upload(file, session.user.id, 'missionary', 'missionary', true);
 
-    return { imageUrl: this.fileUploadService.getAvatarUrl(filePath) };
+    return { imageUrl: this.fileUploadService.getMediaUrl(filePath) };
   }
 
   @Get()

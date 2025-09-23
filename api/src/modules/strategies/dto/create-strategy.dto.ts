@@ -2,7 +2,7 @@ import { IsString, IsOptional } from 'class-validator';
 
 export class CreateStrategyDto {
   @IsString()
-  name: string;
+  title: string;
 
   @IsOptional()
   @IsString()
@@ -11,4 +11,22 @@ export class CreateStrategyDto {
   @IsOptional()
   @IsString()
   imagePath?: string;
+
+  @IsString()
+  slug: string;
+
+  @IsString()
+  fullDescription: string;
+
+  @IsString()
+  impactQuote: string;
+  
+  @IsString()
+  involvedText: string;
+
+  @IsString()
+  visionText: string;
+
+  @IsOptional()
+  activities?: string[];
 }

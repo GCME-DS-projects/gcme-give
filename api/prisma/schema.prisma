@@ -8,8 +8,8 @@ datasource db {
 }
 
 enum ROLE{
-  MISSINARY,
-  ADMIN,
+  MISSINARY
+  ADMIN
   SUPER_ADMIN
 }
 
@@ -23,6 +23,7 @@ model User {
   updatedAt     DateTime     @default(now()) @updatedAt
   sessions      Session[]
   accounts      Account[]
+  roles         UserRole[]
   missionary    Missionary?
 
   @@map("user")
@@ -162,14 +163,23 @@ model Projects {
 
 model Strategy {
   id            String         @id @default(uuid())
-  name          String         @unique
+  title         String         @unique
   description   String?
   imagePath     String?
+  slug          String
+  fullDescription String
+  impactQuote   String
+  involvedText  String
+  visionText    String
+  activities    String[]
+  
+
   missionaries  Missionary[]
   projects      Projects[]
   contributions Contribution[]
+  roles         UserRole[]
 
-  @@index([name])
+  @@index([title])
 }
 
 model Contributor {

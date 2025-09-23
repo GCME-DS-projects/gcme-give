@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "public"."ROLE" AS ENUM ('MISSINARY', 'ADMIN', 'SUPER_ADMIN');
+
+-- CreateEnum
 CREATE TYPE "public"."TRANSACTION_STATUS" AS ENUM ('PENDING', 'SUCCESS', 'FAILED');
 
 -- CreateEnum
@@ -15,6 +18,16 @@ CREATE TABLE "public"."user" (
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."UserRole" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "strategyId" TEXT,
+    "role" "public"."ROLE" NOT NULL,
+
+    CONSTRAINT "UserRole_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -128,8 +141,15 @@ CREATE TABLE "public"."Projects" (
 -- CreateTable
 CREATE TABLE "public"."Strategy" (
     "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
     "description" TEXT,
+    "imagePath" TEXT,
+    "slug" TEXT NOT NULL,
+    "fullDescription" TEXT NOT NULL,
+    "impactQuote" TEXT NOT NULL,
+    "involvedText" TEXT NOT NULL,
+    "visionText" TEXT NOT NULL,
+    "activities" TEXT[],
 
     CONSTRAINT "Strategy_pkey" PRIMARY KEY ("id")
 );
@@ -220,7 +240,10 @@ CREATE INDEX "Projects_slug_idx" ON "public"."Projects"("slug");
 CREATE INDEX "Projects_strategyId_idx" ON "public"."Projects"("strategyId");
 
 -- CreateIndex
-CREATE INDEX "Strategy_name_idx" ON "public"."Strategy"("name");
+CREATE UNIQUE INDEX "Strategy_title_key" ON "public"."Strategy"("title");
+
+-- CreateIndex
+CREATE INDEX "Strategy_title_idx" ON "public"."Strategy"("title");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Contributor_email_key" ON "public"."Contributor"("email");
@@ -251,6 +274,12 @@ CREATE INDEX "Transaction_contributionId_idx" ON "public"."Transaction"("contrib
 
 -- CreateIndex
 CREATE INDEX "Transaction_status_idx" ON "public"."Transaction"("status");
+
+-- AddForeignKey
+ALTER TABLE "public"."UserRole" ADD CONSTRAINT "UserRole_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."UserRole" ADD CONSTRAINT "UserRole_strategyId_fkey" FOREIGN KEY ("strategyId") REFERENCES "public"."Strategy"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
