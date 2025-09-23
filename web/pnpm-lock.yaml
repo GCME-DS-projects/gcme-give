@@ -66,8 +66,8 @@ importers:
         specifier: ^3.3.1
         version: 3.3.1
       zod:
-        specifier: link:@hookform/resolvers/zod
-        version: 3.25.76
+        specifier: ^4.1.11
+        version: 4.1.11
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
