@@ -11,7 +11,8 @@ export class CreateProjectDto {
   shortDescription: string;
 
   @IsOptional()
-  image?: Buffer;
+  @IsString()
+  image?: string;
 
   @IsOptional()
   @IsString()
@@ -67,7 +68,6 @@ export class CreateProjectDto {
   @IsOptional()
   testimonials?: any;
 
-  @IsOptional()
-  @IsUUID()
-  strategyId?: string;
+  @IsString()
+  strategyId: string;
 }

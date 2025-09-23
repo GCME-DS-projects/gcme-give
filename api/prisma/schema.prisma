@@ -135,7 +135,7 @@ model Projects {
   title            String
   slug             String         @unique
   shortDescription String
-  image            Bytes?
+  image            String?
   category         String?
   location         String?
   duration         String?

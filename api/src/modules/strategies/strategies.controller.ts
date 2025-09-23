@@ -5,7 +5,6 @@ import { UpdateStrategyDto } from './dto/update-strategy.dto';
 import { FileUploadService } from '../../common/services/file-upload.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as nestjsBetterAuth from '@thallesp/nestjs-better-auth';
-import { s } from 'node_modules/better-auth/dist/shared/better-auth.7zTmTxT4.cjs';
 
 @Controller('strategies')
 export class StrategiesController {
