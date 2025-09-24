@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Project } from "@/lib/types";
 import Header from "@/components/public/common/header";
 import Footer from "@/components/public/common/footer";
-import DonationModal from "@/components/public/landing/donation-modal";
+import DonationModal from "@/components/public/common/donation-modal";
 
 export default function ProjectsPage() {
   // --- Data Fetching using React Query ---

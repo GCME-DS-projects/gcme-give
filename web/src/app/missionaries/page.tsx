@@ -13,7 +13,7 @@ import { Missionary } from "@/lib/types";
 // FIX: Corrected import paths for consistency
 import Header from "@/components/public/common/header";
 import Footer from "@/components/public/common/footer";
-import DonationModal from "@/components/public/landing/donation-modal";
+import DonationModal from "@/components/public/common/donation-modal";
 
 // A simple debounce hook to prevent excessive API calls while typing
 function useDebounce<T>(value: T, delay: number): T {

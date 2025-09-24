@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import type React from "react";
-import { useInitiatePayment } from "@/hooks/use-payment";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -16,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Heart, Smartphone, Loader2, Share2 } from "lucide-react";
+import { Heart,Smartphone, Loader2, Share2 } from "lucide-react";
 
 interface DonationModalProps {
   isOpen: boolean;
@@ -33,7 +34,6 @@ export default function DonationModal({
   title,
   description,
 }: DonationModalProps) {
-  // --- UI State ---
   const [step, setStep] = useState(1);
   const [donationType, setDonationType] = useState<"one-time" | "monthly">(
     "one-time",
@@ -41,10 +41,9 @@ export default function DonationModal({
   const [amount, setAmount] = useState("");
   const [customAmount, setCustomAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
-
-  // --- React Query Mutation for Payment ---
-  const { mutate: initiatePayment, isPending: isProcessing } = useInitiatePayment();
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
 
   const predefinedAmounts = ["2,000", "5,000", "10,000", "25,000", "50,000", "100,000"];
 
@@ -62,51 +61,97 @@ export default function DonationModal({
     return customAmount || amount;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setPaymentError(null); // Reset error on new submission
+  const processTelebirrPayment = async () => {
+    setIsProcessing(true);
+    setPaymentError(null);
 
-    if (paymentMethod === "telebirr") {
-      // 1. Validate amount from the current state
+    try {
+      // Validate and clean amount
       const rawAmount = getCurrentAmount();
-      const cleanedAmount = rawAmount.replace(/,/g, "");
-      const numericAmount = parseFloat(cleanedAmount);
+      const amount = rawAmount.replace(/,/g, ''); // Remove commas
 
-      if (isNaN(numericAmount) || numericAmount <= 0) {
-        setPaymentError("Please enter a valid donation amount.");
-        return;
+      if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) {
+        throw new Error("Please enter a valid amount");
       }
 
-      // 2. Prepare payment data transfer object (DTO)
+      // Create a descriptive title based on the donation type and details
       const paymentTitle = `Great Commission Ethiopia - ${
         type === "project" ? "Project" : "Missionary"
       } Support: ${title}`;
-      
-      const paymentDto = { title: paymentTitle, amount: numericAmount };
 
-      // 3. Store details in session storage before redirecting
-      // This allows retrieving details on the redirect confirmation page.
-      sessionStorage.setItem(
-        "donationDetails",
-        JSON.stringify({
-          type,
+      const apiKey = process.env.NEXT_PUBLIC_PAYMENT_API_KEY;
+      const paymentGatewayUrl = "/api/payment";
+
+      const response = await fetch(paymentGatewayUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          amount,
           title,
-          amount: cleanedAmount,
-          timestamp: new Date().toISOString(),
+          test: true,
         }),
-      );
-
-      // 4. Call the mutation hook to initiate the payment
-      initiatePayment(paymentDto, {
-        onError: (error) => {
-          // The hook shows a generic toast, but we also show a specific error inside the modal.
-          setPaymentError(error.message || "An unexpected error occurred.");
-        }
       });
 
+      const data: any = await response.json();
+      console.log("Payment response:", data);
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || data.error || `Payment failed: ${response.status}`,
+        );
+      }
+
+      if (data.success && data.paymentUrl) {
+        // Store donation details in session storage before redirecting
+        sessionStorage.setItem(
+          "donationDetails",
+          JSON.stringify({
+            type,
+            title,
+            amount,
+            timestamp: new Date().toISOString(),
+          }),
+        );
+
+        // Redirect to payment URL
+        window.location.href = data.paymentUrl;
+      } else {
+        throw new Error(data.message || "Failed to create payment");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      setPaymentError(
+        error instanceof Error
+          ? error.message
+          : "An error occurred during payment",
+      );
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  function useAnchorOpen(link: string) {
+    let anchorEle = document.createElement("a");
+    anchorEle.setAttribute("href", link);
+    anchorEle.setAttribute("target", "_blank");
+    anchorEle.setAttribute("rel", "external");
+    anchorEle.style.display = "none";
+    anchorEle.click();
+  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (paymentMethod === "telebirr") {
+      await processTelebirrPayment();
     } else {
-      // Handle other (currently simulated) payment methods
-      setStep(4);
+      // For other payment methods, simulate payment processing
+      setIsProcessing(true);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setIsProcessing(false);
+      setStep(4); // Success step for other payment methods
     }
   };
 
@@ -116,12 +161,20 @@ export default function DonationModal({
     setAmount("");
     setCustomAmount("");
     setPaymentMethod("");
+    setIsProcessing(false);
     setPaymentError(null);
+    setPaymentUrl(null);
   };
 
   const handleClose = () => {
     resetModal();
     onClose();
+  };
+
+  const redirectToPayment = () => {
+    if (paymentUrl) {
+      window.location.href = paymentUrl;
+    }
   };
 
   const generateShareableLink = () => {
@@ -136,6 +189,7 @@ export default function DonationModal({
 
   const handleShare = async () => {
     const shareableLink = generateShareableLink();
+    
     if (navigator.share) {
       try {
         await navigator.share({
@@ -144,10 +198,13 @@ export default function DonationModal({
           url: shareableLink,
         });
       } catch (error) {
+        console.error("Error sharing:", error);
+        // Fallback to copying to clipboard
         await navigator.clipboard.writeText(shareableLink);
         alert("Link copied to clipboard!");
       }
     } else {
+      // Fallback to copying to clipboard
       await navigator.clipboard.writeText(shareableLink);
       alert("Link copied to clipboard!");
     }
@@ -165,7 +222,9 @@ export default function DonationModal({
               <DialogTitle className="text-xl text-neutral-800">
                 {step === 4
                   ? "Thank You!"
-                  : `Support ${type === "project" ? "Project" : "Missionary"}`}
+                  : step === 5
+                    ? "Complete Payment"
+                    : `Support ${type === "project" ? "Project" : "Missionary"}`}
               </DialogTitle>
             </div>
             <Button
@@ -177,7 +236,7 @@ export default function DonationModal({
               <Share2 className="w-5 h-5" />
             </Button>
           </div>
-          {step !== 4 && (
+          {step !== 4 && step !== 5 && (
             <DialogDescription className="text-neutral-600">
               {title}
               {description && (
@@ -189,6 +248,7 @@ export default function DonationModal({
 
         {step === 1 && (
           <div className="space-y-6">
+            {/* Donation Type */}
             <div>
               <Label className="text-base font-semibold text-neutral-800 mb-3 block">
                 Donation Type
@@ -223,6 +283,7 @@ export default function DonationModal({
               </RadioGroup>
             </div>
 
+            {/* Amount Selection */}
             <div>
               <Label className="text-base font-semibold text-neutral-800 mb-3 block">
                 Amount (Ethiopian Birr)
@@ -266,7 +327,7 @@ export default function DonationModal({
               onClick={() => setStep(2)}
               disabled={
                 !getCurrentAmount() ||
-                parseFloat(getCurrentAmount().replace(/,/g, '')) <= 0
+                Number.parseFloat(getCurrentAmount()) <= 0
               }
               className="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white h-12 shadow-lg"
             >
@@ -277,6 +338,7 @@ export default function DonationModal({
 
         {step === 2 && (
           <div className="space-y-6">
+            {/* Payment Method */}
             <div>
               <Label className="text-base font-semibold text-neutral-800 mb-3 block">
                 Payment Method
@@ -291,7 +353,7 @@ export default function DonationModal({
                     htmlFor="telebirr"
                     className="flex-1 cursor-pointer flex items-center"
                   >
-                    <Smartphone className="w-5 h-5 mr-3 text-green-600" />
+                    <Smartphone className="w-5 h-5 mr-3 text-success-600" />
                     <div>
                       <div className="font-medium">TeleBirr</div>
                       <div className="text-sm text-neutral-600">
@@ -300,9 +362,40 @@ export default function DonationModal({
                     </div>
                   </Label>
                 </div>
+                {/* <div className="flex items-center space-x-2 p-3 border border-neutral-200 rounded-lg hover:bg-neutral-50 hover:border-primary-300 transition-colors">
+                  <RadioGroupItem value="cbe" id="cbe" />
+                  <Label
+                    htmlFor="cbe"
+                    className="flex-1 cursor-pointer flex items-center"
+                  >
+                    <Banknote className="w-5 h-5 mr-3 text-secondary-600" />
+                    <div>
+                      <div className="font-medium">CBE Birr</div>
+                      <div className="text-sm text-neutral-600">
+                        Commercial Bank of Ethiopia
+                      </div>
+                    </div>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 border border-neutral-200 rounded-lg hover:bg-neutral-50 hover:border-primary-300 transition-colors">
+                  <RadioGroupItem value="card" id="card" />
+                  <Label
+                    htmlFor="card"
+                    className="flex-1 cursor-pointer flex items-center"
+                  >
+                    <CreditCard className="w-5 h-5 mr-3 text-neutral-600" />
+                    <div>
+                      <div className="font-medium">Credit/Debit Card</div>
+                      <div className="text-sm text-neutral-600">
+                        Visa, Mastercard
+                      </div>
+                    </div>
+                  </Label>
+                </div> */}
               </RadioGroup>
             </div>
 
+            {/* Summary */}
             <Card className="bg-primary-50 border-primary-200">
               <CardContent className="p-4">
                 <div className="flex justify-between items-center mb-2">
@@ -347,17 +440,156 @@ export default function DonationModal({
 
         {step === 3 && (
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Payment Details */}
             <div>
               <Label className="text-base font-semibold text-neutral-800 mb-3 block">
-                Confirm Donation
+                Payment Details
               </Label>
-              <p className="text-neutral-600 text-sm">
-                You are about to donate{" "}
-                <strong className="text-primary-600">
-                  ብር {getCurrentAmount()}
-                </strong>{" "}
-                to support <strong>{title}</strong>. Clicking 'Donate' will proceed to the TeleBirr payment page to complete your transaction.
-              </p>
+
+              {paymentMethod === "telebirr" && (
+                <div className="space-y-4">
+                  <div>
+                    <Label
+                      htmlFor="phone"
+                      className="text-sm text-neutral-600 mb-2 block"
+                    >
+                      Phone Number
+                    </Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+251 9XX XXX XXX"
+                      required
+                      className="border-neutral-300 focus:border-primary-600 focus:ring-primary-600"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {paymentMethod === "cbe" && (
+                <div className="space-y-4">
+                  <div>
+                    <Label
+                      htmlFor="account"
+                      className="text-sm text-neutral-600 mb-2 block"
+                    >
+                      Account Number
+                    </Label>
+                    <Input
+                      id="account"
+                      type="text"
+                      placeholder="Enter your CBE account number"
+                      required
+                      className="border-neutral-300 focus:border-primary-600 focus:ring-primary-600"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {paymentMethod === "card" && (
+                <div className="space-y-4">
+                  <div>
+                    <Label
+                      htmlFor="card-number"
+                      className="text-sm text-neutral-600 mb-2 block"
+                    >
+                      Card Number
+                    </Label>
+                    <Input
+                      id="card-number"
+                      type="text"
+                      placeholder="1234 5678 9012 3456"
+                      required
+                      className="border-neutral-300 focus:border-primary-600 focus:ring-primary-600"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label
+                        htmlFor="expiry"
+                        className="text-sm text-neutral-600 mb-2 block"
+                      >
+                        Expiry Date
+                      </Label>
+                      <Input
+                        id="expiry"
+                        type="text"
+                        placeholder="MM/YY"
+                        required
+                        className="border-neutral-300 focus:border-primary-600 focus:ring-primary-600"
+                      />
+                    </div>
+                    <div>
+                      <Label
+                        htmlFor="cvv"
+                        className="text-sm text-neutral-600 mb-2 block"
+                      >
+                        CVV
+                      </Label>
+                      <Input
+                        id="cvv"
+                        type="text"
+                        placeholder="123"
+                        required
+                        className="border-neutral-300 focus:border-primary-600 focus:ring-primary-600"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Donor Information */}
+            <div>
+              <Label className="text-base font-semibold text-neutral-800 mb-3 block">
+                Your Information
+              </Label>
+              <div className="space-y-4">
+                <div>
+                  <Label
+                    htmlFor="donor-name"
+                    className="text-sm text-neutral-600 mb-2 block"
+                  >
+                    Full Name
+                  </Label>
+                  <Input
+                    id="donor-name"
+                    type="text"
+                    placeholder="Enter your full name"
+                    required
+                    className="border-neutral-300 focus:border-primary-600 focus:ring-primary-600"
+                  />
+                </div>
+                <div>
+                  <Label
+                    htmlFor="donor-email"
+                    className="text-sm text-neutral-600 mb-2 block"
+                  >
+                    Email Address
+                  </Label>
+                  <Input
+                    id="donor-email"
+                    type="email"
+                    placeholder="your.email@example.com"
+                    required
+                    className="border-neutral-300 focus:border-primary-600 focus:ring-primary-600"
+                  />
+                </div>
+                <div>
+                  <Label
+                    htmlFor="message"
+                    className="text-sm text-neutral-600 mb-2 block"
+                  >
+                    Message (Optional)
+                  </Label>
+                  <Textarea
+                    id="message"
+                    placeholder="Leave an encouraging message..."
+                    className="border-neutral-300 focus:border-primary-600 focus:ring-primary-600"
+                    rows={3}
+                  />
+                </div>
+              </div>
             </div>
 
             {paymentError && (
@@ -396,19 +628,23 @@ export default function DonationModal({
 
         {step === 4 && (
           <div className="text-center space-y-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto shadow-lg">
-              <Heart className="w-8 h-8 text-green-600" />
+            <div className="w-16 h-16 bg-gradient-to-br from-success-100 to-success-200 rounded-full flex items-center justify-center mx-auto shadow-lg">
+              <Heart className="w-8 h-8 text-success-600" />
             </div>
             <div>
               <h3 className="text-2xl font-bold text-neutral-800 mb-2">
                 Thank You!
               </h3>
               <p className="text-neutral-600 mb-4">
-                Your simulated donation of{" "}
+                Your donation of{" "}
                 <span className="font-semibold text-primary-600">
                   ብር {getCurrentAmount()}
                 </span>{" "}
-                is complete.
+                has been processed successfully.
+              </p>
+              <p className="text-sm text-neutral-500">
+                You will receive a confirmation email shortly. Your support
+                makes a real difference in the lives of those we serve.
               </p>
             </div>
             <Button
@@ -417,6 +653,45 @@ export default function DonationModal({
             >
               Close
             </Button>
+          </div>
+        )}
+
+        {step === 5 && (
+          <div className="text-center space-y-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center mx-auto shadow-lg">
+              <Smartphone className="w-8 h-8 text-primary-600" />
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-neutral-800 mb-2">
+                Complete Your Payment
+              </h3>
+              <p className="text-neutral-600 mb-4">
+                Your TeleBirr payment of{" "}
+                <span className="font-semibold text-primary-600">
+                  ብር {getCurrentAmount()}
+                </span>{" "}
+                is ready.
+              </p>
+              <p className="text-sm text-neutral-500 mb-6">
+                Click the button below to be redirected to the TeleBirr payment
+                gateway to complete your transaction.
+              </p>
+
+              <Button
+                onClick={redirectToPayment}
+                className="w-full bg-gradient-to-r from-success-500 to-success-600 hover:from-success-600 hover:to-success-700 text-white shadow-lg h-12 mb-4"
+              >
+                Complete Payment on TeleBirr
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={handleClose}
+                className="w-full border-neutral-300 text-neutral-700 hover:bg-neutral-50"
+              >
+                Cancel
+              </Button>
+            </div>
           </div>
         )}
       </DialogContent>

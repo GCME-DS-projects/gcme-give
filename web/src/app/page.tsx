@@ -9,7 +9,7 @@ import HeroSection from "@/components/public/landing/hero-section";
 import ProjectsSection from "@/components/public/landing/projects-section";
 import StrategiesSection from "@/components/public/landing/strategies-section";
 import MissionariesSection from "@/components/public/landing/missionaries-section";
-import DonationModal from "@/components/public/landing/donation-modal";
+import DonationModal from "@/components/public/common/donation-modal";
 import Footer from "@/components/public/common/footer";
 
 export default function MissionaryDonationPlatform() {
