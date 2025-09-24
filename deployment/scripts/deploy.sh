@@ -105,6 +105,11 @@ build_applications() {
     # Build with linting disabled for deployment
     ESLINT_NO_DEV_ERRORS=true pnpm run build
     
+    # Copy static assets to standalone build
+    print_status "Copying static assets to standalone build..."
+    cp -r .next/static .next/standalone/web/.next/ 2>/dev/null || true
+    cp -r public/* .next/standalone/web/public/ 2>/dev/null || true
+    
     print_success "Applications built successfully"
 }
 

@@ -76,12 +76,12 @@ setup_ssl_certificates() {
         -d www.give.dsethiopia.org
     
     # Get certificate for API domain
-    print_status "Getting SSL certificate for api.give.dsethiopia.org..."
+    print_status "Getting SSL certificate for apigive.dsethiopia.org..."
     sudo certbot certonly --standalone \
         --non-interactive \
         --agree-tos \
         --email admin@dsethiopia.org \
-        -d api.give.dsethiopia.org
+        -d apigive.dsethiopia.org
     
     # Start nginx
     sudo systemctl start nginx
@@ -126,7 +126,7 @@ main() {
     print_status "Certificates are valid for 90 days and will auto-renew"
     print_status "Certificate locations:"
     print_status "- give.dsethiopia.org: /etc/letsencrypt/live/give.dsethiopia.org/"
-    print_status "- api.give.dsethiopia.org: /etc/letsencrypt/live/api.give.dsethiopia.org/"
+    print_status "- apigive.dsethiopia.org: /etc/letsencrypt/live/apigive.dsethiopia.org/"
 }
 
 # Run main function
