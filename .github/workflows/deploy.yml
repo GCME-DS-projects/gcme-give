@@ -133,7 +133,7 @@ jobs:
             cd /root/gcme-give
             
             # Pull latest changes
-            git pull origin main
+            git pull origin master
             
             # Run deployment script
             ./deployment/scripts/deploy.sh
