@@ -1,14 +1,25 @@
-import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import sharp from 'sharp';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 
-
 @Injectable()
 export class FileUploadService {
   private readonly uploadPath = process.env.UPLOAD_PATH || './uploads';
-  private readonly allowedImageMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
-  private readonly allowedVideoMimeTypes = ['video/mp4', 'video/webm', 'video/ogg'];
+  private readonly allowedImageMimeTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+  ];
+  private readonly allowedVideoMimeTypes = [
+    'video/mp4',
+    'video/webm',
+    'video/ogg',
+  ];
   private readonly maxSizes = {
     avatar: 5 * 1024 * 1024,
     image: 15 * 1024 * 1024,
@@ -18,15 +29,21 @@ export class FileUploadService {
   private readonly categories = ['strategy', 'missionary', 'projects'] as const;
 
   constructor() {
-    this.ensureDirectories();
+    void this.ensureDirectories();
   }
 
   private async ensureDirectories() {
     try {
-      await Promise.all(this.categories.map(cat => fs.mkdir(path.join(this.uploadPath, cat), { recursive: true })));
+      await Promise.all(
+        this.categories.map((cat) =>
+          fs.mkdir(path.join(this.uploadPath, cat), { recursive: true }),
+        ),
+      );
     } catch (err) {
       console.error('Failed to create upload directories', err);
-      throw new InternalServerErrorException('Failed to initialize file upload service');
+      throw new InternalServerErrorException(
+        'Failed to initialize file upload service',
+      );
     }
   }
 
@@ -41,11 +58,14 @@ export class FileUploadService {
     }
   }
 
-  private validateFile(file: Express.Multer.File, type: 'strategy' | 'missionary' | 'projects') {
-    if (!file) throw new BadRequestException('File not provided');
+  // private validateFile(
+  //   file: Express.Multer.File,
+  //   // type: 'strategy' | 'missionary' | 'projects',
+  // ) {
+  //   if (!file) throw new BadRequestException('File not provided');
 
-    //to be done
-  }
+  //   //to be done
+  // }
 
   private async saveFile(buffer: Buffer, folderPath: string, fileName: string) {
     const filePath = path.join(folderPath, fileName);
@@ -59,7 +79,10 @@ export class FileUploadService {
         .resize(400, 400, { fit: 'cover', position: 'center' })
         .jpeg({ quality: 85, progressive: true })
         .toBuffer();
-    } catch (err) {
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      }
       throw new BadRequestException('Failed to process image');
     }
   }
@@ -81,14 +104,15 @@ export class FileUploadService {
   async upload(
     file: Express.Multer.File,
     userId: string,
-    category: typeof this.categories[number],
+    category: (typeof this.categories)[number],
     prefix: string,
     optimize = false,
   ): Promise<string> {
     try {
-      
       const userPath = await this.ensureUserDirectory(category, userId);
-      const buffer = optimize ? await this.optimizeImage(file.buffer) : file.buffer;
+      const buffer = optimize
+        ? await this.optimizeImage(file.buffer)
+        : file.buffer;
       const fileName = this.generateFileName(prefix, file.originalname);
       await this.saveFile(buffer, userPath, fileName);
 
@@ -102,11 +126,18 @@ export class FileUploadService {
   async deleteFile(filePath: string) {
     try {
       if (!filePath) return;
-      const fullPath = path.join(this.uploadPath, filePath.replace('/uploads/', ''));
+      const fullPath = path.join(
+        this.uploadPath,
+        filePath.replace('/uploads/', ''),
+      );
       if (await fs.stat(fullPath).catch(() => false)) {
         await fs.unlink(fullPath);
       }
-    } catch {}
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      }
+    }
   }
 
   getMediaUrl(filePath: string) {

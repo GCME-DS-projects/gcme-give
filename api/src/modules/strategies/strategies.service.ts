@@ -30,7 +30,8 @@ export class StrategiesService {
         contributions: true,
       },
     });
-    if (!strategy) throw new NotFoundException(`Strategy with id ${id} not found`);
+    if (!strategy)
+      throw new NotFoundException(`Strategy with id ${id} not found`);
     return strategy;
   }
 

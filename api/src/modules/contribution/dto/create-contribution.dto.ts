@@ -1,4 +1,10 @@
-import { IsUUID, IsOptional, IsNumber, IsString, IsEnum } from 'class-validator';
+import {
+  IsUUID,
+  IsOptional,
+  IsNumber,
+  IsString,
+  IsEnum,
+} from 'class-validator';
 import { PAYMENT_METHOD } from '@prisma/client';
 
 export class CreateContributionDto {

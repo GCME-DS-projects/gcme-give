@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Put, UseInterceptors, UploadedFile, BadRequestException, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Param,
+  Body,
+  Put,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
+  UseGuards,
+} from '@nestjs/common';
 import { StrategiesService } from './strategies.service';
 import { CreateStrategyDto } from './dto/create-strategy.dto';
 import { UpdateStrategyDto } from './dto/update-strategy.dto';
@@ -38,12 +50,12 @@ export class StrategiesController {
     return this.strategiesService.remove(id);
   }
 
- @Post('upload/image')
- @UseGuards(nestjsBetterAuth.AuthGuard)
+  @Post('upload/image')
+  @UseGuards(nestjsBetterAuth.AuthGuard)
   @UseInterceptors(FileInterceptor('image'))
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
-    @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession
+    @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession,
   ) {
     if (!session?.user?.id) {
       console.error('User session not found or invalid:', session);
@@ -53,11 +65,15 @@ export class StrategiesController {
     console.log('Uploaded file:', file);
     if (!file) throw new BadRequestException('No file uploaded');
 
-    const imagePath = await this.fileUploadService.upload(file, session.user.id, 'strategy', 'strategy');
+    const imagePath = await this.fileUploadService.upload(
+      file,
+      session.user.id,
+      'strategy',
+      'strategy',
+    );
 
     return {
       imageUrl: this.fileUploadService.getMediaUrl(imagePath),
     };
   }
-
 }

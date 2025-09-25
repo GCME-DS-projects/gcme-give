@@ -7,9 +7,6 @@ import { FileUploadService } from 'src/common/services/file-upload.service';
 @Module({
   imports: [PrismaModule],
   controllers: [MissionariesController],
-  providers: [
-    MissionariesService, 
-    FileUploadService,
-  ],
+  providers: [MissionariesService, FileUploadService],
 })
 export class MissionariesModule {}

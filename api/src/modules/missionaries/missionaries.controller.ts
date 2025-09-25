@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseInterceptors, UploadedFile, BadRequestException, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  Query,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
+  UseGuards,
+} from '@nestjs/common';
 import { MissionariesService } from './missionaries.service';
 import { CreateMissionaryDto } from './dto/create-missionary.dto';
 import { UpdateMissionaryDto } from './dto/update-missionary.dto';
@@ -18,7 +31,7 @@ export class MissionariesController {
   @UseGuards(nestjsBetterAuth.AuthGuard)
   async create(
     @Body() dto: CreateMissionaryDto,
-    @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession
+    // @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession,
   ) {
     // dto.userId = session.user.id;
     return this.missionariesService.create(dto);
@@ -29,7 +42,7 @@ export class MissionariesController {
   @UseInterceptors(FileInterceptor('image'))
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
-    @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession
+    @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession,
   ) {
     if (!session?.user?.id) {
       console.error('User session not found or invalid:', session);
@@ -39,9 +52,14 @@ export class MissionariesController {
     console.log('Uploaded file:', file);
     if (!file) throw new BadRequestException('No file uploaded');
 
-    const imagePath = await this.fileUploadService.upload(file, session.user.id, 'missionary', 'missionary');
+    const imagePath = await this.fileUploadService.upload(
+      file,
+      session.user.id,
+      'missionary',
+      'missionary',
+    );
     console.log('Image uploaded to path:', imagePath);
-    console.log("image url:", this.fileUploadService.getMediaUrl(imagePath));
+    console.log('image url:', this.fileUploadService.getMediaUrl(imagePath));
 
     return {
       imageUrl: this.fileUploadService.getMediaUrl(imagePath),

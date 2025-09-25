@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  UploadedFile,
+  UseInterceptors,
+  BadRequestException,
+} from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -19,28 +31,33 @@ export class ProjectsController {
   }
 
   @Post('upload/image')
-   @UseGuards(nestjsBetterAuth.AuthGuard)
-    @UseInterceptors(FileInterceptor('image'))
-    async uploadImage(
-      @UploadedFile() file: Express.Multer.File,
-      @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession
-    ) {
-      if (!session?.user?.id) {
-        console.error('User session not found or invalid:', session);
-        throw new BadRequestException('User session not found. Please login.');
-      }
-  
-      console.log('Uploaded file:', file);
-      if (!file) throw new BadRequestException('No file uploaded');
-  
-      const imagePath = await this.fileUploadService.upload(file, session.user.id, 'projects', 'projects');
-      console.log('Image uploaded to path:', imagePath);
-      console.log("image url:", this.fileUploadService.getMediaUrl(imagePath));
-  
-      return {
-        imageUrl: this.fileUploadService.getMediaUrl(imagePath),
-      };
+  @UseGuards(nestjsBetterAuth.AuthGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+    @nestjsBetterAuth.Session() session: nestjsBetterAuth.UserSession,
+  ) {
+    if (!session?.user?.id) {
+      console.error('User session not found or invalid:', session);
+      throw new BadRequestException('User session not found. Please login.');
     }
+
+    console.log('Uploaded file:', file);
+    if (!file) throw new BadRequestException('No file uploaded');
+
+    const imagePath = await this.fileUploadService.upload(
+      file,
+      session.user.id,
+      'projects',
+      'projects',
+    );
+    console.log('Image uploaded to path:', imagePath);
+    console.log('image url:', this.fileUploadService.getMediaUrl(imagePath));
+
+    return {
+      imageUrl: this.fileUploadService.getMediaUrl(imagePath),
+    };
+  }
 
   @Get()
   findAll() {

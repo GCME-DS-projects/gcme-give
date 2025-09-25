@@ -29,7 +29,8 @@ export class ProjectsService {
         contributions: true,
       },
     });
-    if (!project) throw new NotFoundException(`Project with id ${id} not found`);
+    if (!project)
+      throw new NotFoundException(`Project with id ${id} not found`);
     return project;
   }
 
@@ -40,6 +41,9 @@ export class ProjectsService {
 
   async remove(id: string) {
     await this.findOne(id);
-    return this.prisma.projects.update({ where: { id }, data: { isDeleted: true } });
+    return this.prisma.projects.update({
+      where: { id },
+      data: { isDeleted: true },
+    });
   }
 }

@@ -20,7 +20,7 @@ export class CreateStrategyDto {
 
   @IsString()
   impactQuote: string;
-  
+
   @IsString()
   involvedText: string;
 

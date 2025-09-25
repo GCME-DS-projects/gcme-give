@@ -1,116 +1,123 @@
-import { IsOptional, IsString, IsBoolean, IsArray, IsInt, IsUUID } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsBoolean,
+  IsArray,
+  IsInt,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateMissionaryDto {
-  @IsOptional() 
-  @IsString() 
+  @IsOptional()
+  @IsString()
   imageUrl?: string;
-  
+
   @IsUUID()
   userId?: string;
 
-  @IsOptional() 
-  @IsString() 
+  @IsOptional()
+  @IsString()
   title?: string;
 
-  @IsOptional() 
-  @IsString() 
+  @IsOptional()
+  @IsString()
   phone?: string;
 
-  @IsOptional() 
-  @IsString() 
+  @IsOptional()
+  @IsString()
   shortBio?: string;
 
-  @IsOptional() 
-  @IsString() 
+  @IsOptional()
+  @IsString()
   fullBio?: string;
 
-  @IsOptional() 
-  @IsString() 
+  @IsOptional()
+  @IsString()
   location?: string;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   qualification?: string;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   website?: string;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   experience?: string;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   years?: string;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   mission?: string;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   focus?: string;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   status?: string;
-  
-  @IsOptional() 
-  @IsArray() 
+
+  @IsOptional()
+  @IsArray()
   prayerRequests?: string[];
-  
-  @IsOptional() 
+
+  @IsOptional()
   recentUpdates?: any;
-  
-  @IsOptional() 
+
+  @IsOptional()
   supportNeeds?: any;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   type?: string;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   role?: string;
-  
-  @IsOptional() @
-  IsUUID() 
+
+  @IsOptional()
+  @IsUUID()
   strategyId?: string;
-  
-  @IsOptional() 
-  @IsInt() 
+
+  @IsOptional()
+  @IsInt()
   livesImpacted?: number;
-  
-  @IsOptional() 
-  @IsInt() 
+
+  @IsOptional()
+  @IsInt()
   communitiesServed?: number;
-  
-  @IsOptional() 
-  @IsInt() 
+
+  @IsOptional()
+  @IsInt()
   projectsCompleted?: number;
-  
-  @IsOptional() 
-  @IsBoolean() 
+
+  @IsOptional()
+  @IsBoolean()
   isDeleted?: boolean;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   staffId?: string;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   parentRc?: string;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   rcAccount?: string;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   designationNumber?: string;
-  
-  @IsOptional() 
-  @IsString() 
+
+  @IsOptional()
+  @IsString()
   region?: string;
 }

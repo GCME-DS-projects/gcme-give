@@ -15,6 +15,6 @@ import { StrategiesModule } from './modules/strategies/strategies.module';
     MissionariesModule,
     ProjectsModule,
     StrategiesModule,
-  ]
+  ],
 })
 export class AppModule {}

@@ -38,14 +38,20 @@ export class MissionariesService {
   }
 
   async findOne(id: string) {
-    const missionary = await this.prisma.missionary.findUnique({ where: { id } });
-    if (!missionary) throw new NotFoundException(`Missionary with id ${id} not found`);
+    const missionary = await this.prisma.missionary.findUnique({
+      where: { id },
+    });
+    if (!missionary)
+      throw new NotFoundException(`Missionary with id ${id} not found`);
     return missionary;
   }
 
   async update(id: string, dto: UpdateMissionaryDto) {
-    const missionary = await this.prisma.missionary.findUnique({ where: { id } });
-    if (!missionary) throw new NotFoundException(`Missionary with id ${id} not found`);
+    const missionary = await this.prisma.missionary.findUnique({
+      where: { id },
+    });
+    if (!missionary)
+      throw new NotFoundException(`Missionary with id ${id} not found`);
 
     return this.prisma.missionary.update({
       where: { id },
@@ -54,8 +60,11 @@ export class MissionariesService {
   }
 
   async remove(id: string) {
-    const missionary = await this.prisma.missionary.findUnique({ where: { id } });
-    if (!missionary) throw new NotFoundException(`Missionary with id ${id} not found`);
+    const missionary = await this.prisma.missionary.findUnique({
+      where: { id },
+    });
+    if (!missionary)
+      throw new NotFoundException(`Missionary with id ${id} not found`);
 
     return this.prisma.missionary.update({
       where: { id },
