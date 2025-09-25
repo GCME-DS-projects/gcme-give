@@ -148,7 +148,7 @@ jobs:
           sleep 30
           
           # Check API health
-          curl -f https://api.give.dsethiopia.org/health || exit 1
+          curl -f https://apigive.dsethiopia.org/health || exit 1
           
           # Check Web health
           curl -f https://give.dsethiopia.org || exit 1
@@ -159,7 +159,7 @@ jobs:
           if [ ${{ job.status }} == 'success' ]; then
             echo "✅ Deployment successful!"
             echo "🌐 Web: https://give.dsethiopia.org"
-            echo "🔗 API: https://api.give.dsethiopia.org"
+            echo "🔗 API: https://apigive.dsethiopia.org"
           else
             echo "❌ Deployment failed!"
           fi
