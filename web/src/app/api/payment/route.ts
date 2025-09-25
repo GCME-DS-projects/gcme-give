@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     console.log("Received payment request");
 
     // Parse the request body
-    let body;
+    let body: PaymentRequestBody;
     try {
       body = await request.json();
       console.log("Request body:", JSON.stringify(body, null, 2));
@@ -180,8 +180,9 @@ export async function POST(request: Request) {
             success: true,
             paymentUrl: paymentUrl,
           });
-        } catch (e) {
+        } catch (error) {
           console.error("Invalid payment URL received:", paymentUrl);
+          console.log(error);
           return NextResponse.json(
             { error: "Invalid payment URL format received from gateway" },
             { status: 500 }

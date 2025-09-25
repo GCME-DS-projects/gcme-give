@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 
 function SignInForm() {
   const [email, setEmail] = useState("");
@@ -37,7 +38,8 @@ function SignInForm() {
       } else {
         router.push(callbackUrl);
       }
-    } catch (err) {
+    } catch (error) {
+      console.log(error)
       setError("An unexpected error occurred");
     } finally {
       setIsLoading(false);
@@ -49,9 +51,11 @@ function SignInForm() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-4">
-            <img
+            <Image
               src="/logo/gcme-logo.png"
               alt="GCME Logo"
+              width={64}
+              height={64}
               className="h-16 w-auto"
             />
           </div>

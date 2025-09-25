@@ -26,10 +26,19 @@ export function EditProjectDialog({ project, isOpen, onOpenChange }: EditProject
         <DialogHeader>
           <DialogTitle>Edit Project</DialogTitle>
           <DialogDescription>
-            Update the details for "{project.name}".
+            Update the details for &quot;{project.title}&quot;.
           </DialogDescription>
         </DialogHeader>
-        <ProjectForm onSubmit={handleSubmit} isPending={isPending} defaultValues={project} />
+          <ProjectForm
+            onSubmit={handleSubmit}
+            isPending={isPending}
+            defaultValues={{
+              ...project,
+              fundingGoal: project.fundingGoal.toString(),
+              fundingRaised: project.fundingRaised.toString(),
+              strategyId: project.strategyId ?? "",
+            }}
+          />
       </DialogContent>
     </Dialog>
   );

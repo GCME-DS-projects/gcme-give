@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Project } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import { MapPin, Clock, Target, Users, BarChart3, AlertCircle, Lightbulb } from "lucide-react";
+import Image from "next/image";
 
 interface ProjectModalProps {
   project: Project;
@@ -38,14 +39,17 @@ export function ProjectModal({ project, onOpenChange }: ProjectModalProps) {
 
         {project.image && (
           <div className="relative mb-8">
-            <img
+            <Image
               src={project.image}
               alt={project.title}
+              width={1200} // adjust as needed
+              height={500} // adjust as needed
               className="w-full h-80 object-cover rounded-2xl shadow-md border border-gray-200"
             />
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-[#001F54]/30 to-transparent" />
           </div>
         )}
+
 
         <div className="space-y-10 text-gray-800">
           {/* Basic Info */}

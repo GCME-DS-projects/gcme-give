@@ -5,18 +5,18 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import {
-  Users, Globe, Church, BookOpen, Video, Heart, Clipboard, Map, Film,
-  Sparkles, Target, Handshake, Lightbulb, ArrowRight, Loader2,
+  Sparkles, Target, Handshake, Lightbulb,  Loader2,
 } from "lucide-react";
 import Link from "next/link";
 import Header from "@/components/public/common/header";
 import Footer from "@/components/public/common/footer";
 import { useGetStrategies } from "@/hooks/queries/use-strategies-query";
+import { Strategy } from "@/lib/types";
 
-const iconMap = {
-  Users, Globe, Church, BookOpen, Video, Heart, Clipboard, Map, Film,
-  Sparkles, Target, Handshake, Lightbulb, ArrowRight,
-};
+// const iconMap = {
+//   Users, Globe, Church, BookOpen, Video, Heart, Clipboard, Map, Film,
+//   Sparkles, Target, Handshake, Lightbulb, ArrowRight,
+// };
 
 export default function StrategyDetailPage() {
   const params = useParams();
@@ -28,7 +28,7 @@ export default function StrategyDetailPage() {
   // Find the specific strategy by slug from the cached list
   const strategy = useMemo(() => {
     if (!slug || strategies.length === 0) return null;
-    return strategies.find((s: any) => s.slug === slug);
+    return strategies.find((s: Strategy) => s.slug === slug);
   }, [slug, strategies]);
 
   if (loading) {
@@ -56,7 +56,7 @@ export default function StrategyDetailPage() {
     );
   }
 
-  const Icon = iconMap[strategy.icon as keyof typeof iconMap];
+  // const Icon = iconMap[strategy.icon as keyof typeof iconMap];
 
   return (
     <>
@@ -207,7 +207,7 @@ export default function StrategyDetailPage() {
                   </h2>
                   <div className="bg-primary-500/20 rounded-2xl p-8 mb-12">
                     <blockquote className="text-xl md:text-2xl font-medium text-white italic">
-                      "{strategy.impactQuote}"
+                      &quot;{strategy.impactQuote}&quot;
                     </blockquote>
                   </div>
                   <div className="flex justify-center">

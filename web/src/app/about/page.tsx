@@ -128,7 +128,7 @@ export default function AboutPage() {
                       What started as support for just three missionary families
                       has grown into a network of over 127 missionaries serving
                       across all 11 regions of Ethiopia. Our approach is unique
-                      because we don't send foreign missionaries to Ethiopia –
+                      because we don`&apos;`t send foreign missionaries to Ethiopia,
                       instead, we empower Ethiopians to reach Ethiopians.
                     </p>
                     <p>

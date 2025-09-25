@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { useForm, Controller, useFieldArray, FieldName, FieldPath } from 'react-hook-form';
+import { useForm, Controller, useFieldArray, FieldPath } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -35,15 +35,15 @@ const formSchema = z.object({
   years: z.string().optional(),
   focus: z.string().optional(),
   strategyId: z.string().optional(),
-  livesImpacted: z.coerce.number().optional(),
-  communitiesServed: z.coerce.number().optional(),
-  projectsCompleted: z.coerce.number().optional(),
+  livesImpacted: z.number().optional(),
+  communitiesServed: z.number().optional(),
+  projectsCompleted: z.number().optional(),
   
   // Step 4: Support & Prayer
   prayerRequests: z.array(z.object({ value: z.string().min(1, "Request cannot be empty") })).optional(),
   supportNeeds: z.array(z.object({
     item: z.string().min(1, "Item name is required"),
-    amount: z.coerce.number().min(0, "Amount must be positive"),
+    amount: z.number().min(0, "Amount must be positive"),
     description: z.string().optional()
   })).optional(),
   
@@ -85,37 +85,42 @@ interface MissionaryFormProps {
 
 export function MissionaryForm({ onSubmit, isPending, defaultValues, strategies }: MissionaryFormProps) {
   const [currentStep, setCurrentStep] = useState(0);
-  const { control, handleSubmit, setValue, watch, trigger } = useForm<FormValues>({
-    resolver: zodResolver(formSchema) as any,
-    defaultValues: {
-      imageUrl: defaultValues?.user?.image || '',
-      title: defaultValues?.title || '',
-      phone: defaultValues?.phone || '',
-      shortBio: defaultValues?.shortBio || '',
-      fullBio: defaultValues?.fullBio || '',
-      location: defaultValues?.location || '',
-      status: defaultValues?.status || '',
-      type: defaultValues?.type || '',
-      role: defaultValues?.role || '',
-      strategyId: defaultValues?.strategyId || '',
-      prayerRequests: defaultValues?.prayerRequests?.map(pr => ({ value: pr })) || [],
-      supportNeeds: defaultValues?.supportNeeds || [],
-      qualification: defaultValues?.qualification || '',
-      website: defaultValues?.website || '',
-      experience: defaultValues?.experience || '',
-      years: defaultValues?.years || '',
-      mission: defaultValues?.mission || '',
-      focus: defaultValues?.focus || '',
-      livesImpacted: defaultValues?.livesImpacted || 0,
-      communitiesServed: defaultValues?.communitiesServed || 0,
-      projectsCompleted: defaultValues?.projectsCompleted || 0,
-      staffId: defaultValues?.staffId || '',
-      parentRc: defaultValues?.parentRc || '',
-      rcAccount: defaultValues?.rcAccount || '',
-      designationNumber: defaultValues?.designationNumber || '',
-      region: defaultValues?.region || '',
-    }
-  });
+    const { control, handleSubmit, setValue, watch, trigger } = useForm<FormValues>({
+        resolver: zodResolver<FormValues, unknown, FormValues>(formSchema),
+        defaultValues: {
+            imageUrl: defaultValues?.user?.image || '',
+            title: defaultValues?.title || '',
+            phone: defaultValues?.phone || '',
+            location: defaultValues?.location || '',
+            website: defaultValues?.website || '',
+            status: defaultValues?.status || '',
+            type: defaultValues?.type || '',
+
+            shortBio: defaultValues?.shortBio || '',
+            fullBio: defaultValues?.fullBio || '',
+            mission: defaultValues?.mission || '',
+
+            qualification: defaultValues?.qualification || '',
+            experience: defaultValues?.experience || '',
+            years: defaultValues?.years || '',
+            focus: defaultValues?.focus || '',
+            strategyId: defaultValues?.strategyId || '',
+            livesImpacted: defaultValues?.livesImpacted || 0,
+            communitiesServed: defaultValues?.communitiesServed || 0,
+            projectsCompleted: defaultValues?.projectsCompleted || 0,
+
+            prayerRequests: defaultValues?.prayerRequests?.map(pr => ({ value: pr })) || [],
+            supportNeeds: defaultValues?.supportNeeds || [],
+
+            staffId: defaultValues?.staffId || '',
+            parentRc: defaultValues?.parentRc || '',
+            rcAccount: defaultValues?.rcAccount || '',
+            designationNumber: defaultValues?.designationNumber || '',
+            region: defaultValues?.region || '',
+            role: defaultValues?.role || '',
+        }
+    });
+
   
   const { fields: supportFields, append: appendSupport, remove: removeSupport } = useFieldArray({ control, name: "supportNeeds" });
   const { fields: prayerFields, append: appendPrayer, remove: removePrayer } = useFieldArray({ control, name: "prayerRequests" });

@@ -1,4 +1,4 @@
-import { useForm, Controller, Control, FieldValues, Path } from 'react-hook-form';
+import { useForm, Controller, Control, FieldValues, Path, UseFormStateReturn, ControllerFieldState, ControllerRenderProps } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Loader2, Plus, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGetStrategies } from '@/hooks/queries/use-strategies-query';
+import { Strategy } from '@/lib/types';
 
 // ✅ schema aligned with backend DTO
 const projectSchema = z.object({
@@ -321,7 +322,7 @@ export function ProjectForm({ onSubmit, isPending, defaultValues }: ProjectFormP
                     <SelectValue placeholder={loadingStrategies ? 'Loading...' : 'Select strategy'} />
                   </SelectTrigger>
                   <SelectContent>
-                    {strategies?.map((strategy: any) => (
+                    {strategies?.map((strategy: Strategy) => (
                       <SelectItem key={strategy.id} value={strategy.id}>
                         {strategy.title}
                       </SelectItem>
@@ -364,9 +365,9 @@ function FormField<T extends FieldValues>({
   control: Control<T>;
   name: Path<T>;
   render: (props: {
-    field: any;
-    fieldState: { error?: { message?: string } };
-    formState: any;
+    field: ControllerRenderProps<T, Path<T>>;
+    fieldState: ControllerFieldState;
+    formState: UseFormStateReturn<T>;
   }) => React.ReactElement;
 }) {
   return (

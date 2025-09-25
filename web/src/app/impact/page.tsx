@@ -168,7 +168,7 @@ export default function ImpactPage() {
               </h1>
               <p className="text-xl md:text-2xl text-stone-600 mb-8 leading-relaxed">
                 Through the faithful support of our partners and the dedicated
-                work of our missionaries, we're seeing transformation across all
+                work of our missionaries, we`&apos;`re seeing transformation across all
                 regions of Ethiopia. These are the stories of hope and change.
               </p>
             </div>
@@ -332,7 +332,7 @@ export default function ImpactPage() {
                 Annual Impact
               </h2>
               <p className="text-xl text-stone-600 max-w-2xl mx-auto">
-                Year by year, we're seeing sustainable growth and lasting
+                Year by year, we`&apos;`re seeing sustainable growth and lasting
                 transformation across Ethiopia.
               </p>
             </div>
@@ -409,7 +409,7 @@ export default function ImpactPage() {
                       />
                     </div>
                     <blockquote className="text-stone-700 italic mb-6 text-center">
-                      "{testimonial.quote}"
+                      {`"${testimonial.quote}"`}
                     </blockquote>
                     <div className="text-center">
                       <div className="font-semibold text-stone-800">

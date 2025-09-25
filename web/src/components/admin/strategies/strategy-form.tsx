@@ -47,15 +47,14 @@ export function StrategyForm({
     resolver: zodResolver(strategySchema),
     defaultValues: {
       title: defaultValues.title ?? "",
-      slug: (defaultValues as any).slug ?? "",
-      description: defaultValues.description ?? "",
-      fullDescription: (defaultValues as any).fullDescription ?? "",
-      visionText: (defaultValues as any).visionText ?? "",
-      involvedText: (defaultValues as any).involvedText ?? "",
-      impactQuote: (defaultValues as any).impactQuote ?? "",
-      imagePath: (defaultValues as any).imagePath ?? "",
-      activities: Array.isArray((defaultValues as any).activities)
-        ? (defaultValues as any).activities
+      slug: defaultValues.slug ?? "",
+      fullDescription: defaultValues.fullDescription ?? "",
+      visionText: defaultValues.visionText ?? "",
+      involvedText: defaultValues.involvedText ?? "",
+      impactQuote: defaultValues.impactQuote ?? "",
+      imagePath: defaultValues.imagePath ?? "",
+      activities: Array.isArray(defaultValues.activities)
+        ? defaultValues.activities
         : [],
     },
   });

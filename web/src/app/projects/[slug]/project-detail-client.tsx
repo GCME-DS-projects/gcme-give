@@ -15,11 +15,12 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import DonationModal from "@/components/donation-modal";
-import Header from "@/components/header";
+import DonationModal from "@/components/public/common/donation-modal";
+import Header from "@/components/public/common/header";
+import { Project, Testimonial, TimelineEntry } from "@/lib/types";
 
 interface ProjectDetailClientProps {
-  project: any; // Replace with proper type from your project data
+  project: Project; // Replace with proper type from your project data
 }
 
 export default function ProjectDetailClient({
@@ -84,7 +85,7 @@ export default function ProjectDetailClient({
               <CardContent>
                 <div className="aspect-video relative mb-6">
                   <Image
-                    src={project.image}
+                    src={project.image ?? "/placeholder.png"}
                     alt={project.title}
                     fill
                     className="object-cover rounded-lg"
@@ -120,12 +121,11 @@ export default function ProjectDetailClient({
                     <div className="text-xs text-stone-600">Duration</div>
                   </div>
                 </div>
-
                 <Progress
-                  value={(project.fundingRaised / project.fundingGoal) * 100}
+                  value={((Number(project.fundingRaised) || 0) / (Number(project.fundingGoal) || 1)) * 100}
                   className="mb-6"
                 />
-
+                
                 <Button
                   className="w-full bg-[#f18b1e] hover:bg-[#e2730c] text-white"
                   onClick={() => openDonationModal("project", project.title)}
@@ -171,7 +171,7 @@ export default function ProjectDetailClient({
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {project.timeline.map((phase: any, index: number) => (
+                  {project.timeLine?.map((phase: TimelineEntry, index: number) => (
                     <div key={index} className="flex items-start gap-4">
                       <div className="flex-shrink-0">
                         {phase.status === "completed" && (
@@ -242,11 +242,10 @@ export default function ProjectDetailClient({
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {project.testimonials.map(
-                    (testimonial: any, index: number) => (
+                  {project.testimonials?.map((testimonial: Testimonial, index: number) => (
                       <div key={index} className="bg-stone-50 p-4 rounded-lg">
                         <p className="text-stone-600 italic mb-2">
-                          "{testimonial.quote}"
+                          &quot;{testimonial.quote}&quot;
                         </p>
                         <div className="text-sm">
                           <span className="font-semibold">

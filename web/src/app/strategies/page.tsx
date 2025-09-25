@@ -11,6 +11,7 @@ import {
 import Header from "@/components/public/common/header";
 import Footer from "@/components/public/common/footer";
 import { useGetStrategies } from "@/hooks/queries/use-strategies-query";
+import { Strategy } from "@/lib/types";
 
 const iconMap = {
   Users, Globe, Church, BookOpen, Heart, Clipboard, Map, Film,
@@ -22,7 +23,7 @@ export default function StrategiesPage() {
 
   // Memoize the filtered list to prevent re-calculating on every render
   const strategies = useMemo(
-    () => rawStrategies.filter((s: any) => !s.isDeleted),
+    () => rawStrategies.filter((s: Strategy) => !s.isDeleted),
     [rawStrategies]
   );
 
@@ -61,7 +62,7 @@ export default function StrategiesPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-xl md:text-2xl text-neutral-200 mb-8"
           >
-            Discover how we're reaching communities and transforming lives
+            Discover how we&apos;re reaching communities and transforming lives
             through innovative mission approaches
           </motion.p>
           <motion.div

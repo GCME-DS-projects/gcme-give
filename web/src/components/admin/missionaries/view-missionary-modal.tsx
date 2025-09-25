@@ -25,6 +25,7 @@ import {
   HeartHandshake
 } from "lucide-react";
 import React from "react";
+import Image from "next/image";
 
 // --- Reusable Sub-components for a clean layout ---
 
@@ -73,11 +74,14 @@ export function ViewMissionaryModal({ missionary, isOpen, onOpenChange }: { miss
                 <X className="w-5 h-5" />
             </Button>
             <div className="absolute top-16 left-1/2 -translate-x-1/2 text-center">
-                 <img 
-                    src={missionary.user.image || `https://ui-avatars.com/api/?name=${missionary.user.name}&background=0D47A1&color=fff&size=128`} 
-                    alt={missionary.user.name || 'User'} 
-                    className="w-32 h-32 rounded-full object-cover border-8 border-slate-100 shadow-lg"
+                <Image
+                  src={missionary.user.image || `https://ui-avatars.com/api/?name=${missionary.user.name}&background=0D47A1&color=fff&size=128`}
+                  alt={missionary.user.name || "User"}
+                  width={128}
+                  height={128}
+                  className="w-32 h-32 rounded-full object-cover border-8 border-slate-100 shadow-lg"
                 />
+
                 <h2 className="mt-4 text-3xl font-bold text-[#001F54]">{missionary.user.name}</h2>
                 <p className="text-slate-500">{missionary.title || 'Missionary'}</p>
                 <div className="flex items-center justify-center gap-2 mt-2">

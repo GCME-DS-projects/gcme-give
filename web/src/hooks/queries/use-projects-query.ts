@@ -13,8 +13,13 @@ export const useGetProjects = () =>
     queryKey: projectsQueryKeys.lists(),
     queryFn: () => ProjectsApi.getProjects(),
     staleTime: 5 * 60 * 1000,
-    retry: (failureCount, error: any) =>
-      error?.status !== 401 && failureCount < 2,
+    retry: (failureCount, error: unknown) => {
+      if (typeof error === "object" && error !== null && "status" in error) {
+        const status = (error as { status?: number }).status;
+        return status !== 401 && failureCount < 2;
+      }
+      return failureCount < 2;
+    },
   });
 
 export const useGetProject = (id: string) =>
@@ -23,8 +28,13 @@ export const useGetProject = (id: string) =>
     queryFn: () => ProjectsApi.getProject(id),
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
-    retry: (failureCount, error: any) =>
-      error?.status !== 401 && failureCount < 2,
+    retry: (failureCount, error: unknown) => {
+      if (typeof error === "object" && error !== null && "status" in error) {
+        const status = (error as { status?: number }).status;
+        return status !== 401 && failureCount < 2;
+      }
+      return failureCount < 2;
+    },
   });
 
 export const useCreateProjectMutation = () => {

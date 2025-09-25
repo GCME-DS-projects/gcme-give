@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
 
 interface HeroSectionProps {
   openDonationModal: (
@@ -33,6 +32,131 @@ interface Missionary {
   slug: string;
 }
 
+const projects = [
+  {
+    id: 1,
+    slug: "yotor-church-management-system",
+    title: "Yotor - Modern Church Management",
+    description: "A Secure and Reliable Solution to Manage Your Church",
+    image: "/images/projects/yotor.png?height=200&width=300",
+  },
+  {
+    id: 2,
+    slug: "my-fellow",
+    title: "MY FELLOW",
+    description:
+      "An online platform designed to help you connect with Christian fellowship on campus.",
+    image: "/images/projects/my-fellow.png?height=200&width=300",
+  },
+  {
+    id: 3,
+    slug: "melhk-poadcast",
+    title: "MELHIK - PODCAST",
+    description:
+      "A program that helps Christian youth grow holistically, spiritually, emotionally, physically, and socially.",
+    image: "/images/projects/melhk.png?height=200&width=300",
+  },
+  {
+    id: 4,
+    slug: "gemenaye",
+    title: "GEMENAYE",
+    description:
+      "A platform for sharing testimonies of healing and grace, connecting hurting individuals with support.",
+    image: "/images/projects/gemenaye.png?height=200&width=300",
+  },
+  {
+    id: 5,
+    slug: "habesha-students",
+    title: "HABESHA STUDENTS",
+    description:
+      "A place where students can find true answers to life's questions and God's truth.",
+    image: "/images/projects/habesha-students.png?height=200&width=300",
+  },
+  {
+    id: 6,
+    slug: "hulentenawi",
+    title: "HULENTENAWI",
+    description:
+      "A mobile app that allows users to improve themselves and connect with others on the same journey.",
+    image: "/images/projects/hulentenawi.png?height=200&width=300",
+  },
+  {
+    id: 7,
+    slug: "jesus-film",
+    title: "JESUS FILM",
+    description:
+      "Sharing the Story of Jesus through film, reaching millions with the greatest story ever lived.",
+    image: "/images/projects/jesus-film.png?height=200&width=300",
+  },
+];
+
+const missionaries: Missionary[] = [
+  {
+    id: 1,
+    name: "Senay Kumelachew",
+    role: "Digital Missions & Church Tech",
+    image: "/images/missionaries/senay.png?height=400&width=400",
+    bio: "Passionate about leveraging technology to strengthen churches and spread the gospel across Ethiopia.",
+    slug: "senay-kumelachew",
+  },
+  {
+    id: 2,
+    name: "Samson Usmael",
+    role: "Digital Evangelism & Discipleship",
+    image: "/images/missionaries/samson.png?height=400&width=400",
+    bio: "Dedicated to reaching the digital generation with the message of Christ through innovative online platforms.",
+    slug: "samson-usmael",
+  },
+  {
+    id: 3,
+    name: "Cherinet Alemu",
+    role: "Digital Missions & Mentorship",
+    image: "/images/missionaries/cherinet.png?height=400&width=400",
+    bio: "Committed to mentoring young leaders and equipping them for effective digital ministry.",
+    slug: "cherinet-alemu",
+  },
+  {
+    id: 4,
+    name: "Saron Yohannes",
+    role: "Product Leadership & Digital Evangelism",
+    image: "/images/missionaries/saron.png?height=400&width=400",
+    bio: "Leading innovative digital products that help spread the gospel and disciple believers.",
+    slug: "saron-yohannes",
+  },
+  {
+    id: 5,
+    name: "Rediet Kefetew",
+    role: "Content Creation & Mentorship",
+    image: "/images/missionaries/rediet.png?height=400&width=400",
+    bio: "Creating impactful content that resonates with young people and helps them grow in their faith.",
+    slug: "rediet-kefetew",
+  },
+  {
+    id: 6,
+    name: "Denamo Markos",
+    role: "Software Development & ML",
+    image: "/images/missionaries/denamo.png?height=400&width=400",
+    bio: "Developing cutting-edge software solutions to support ministry and outreach efforts.",
+    slug: "denamo-markos",
+  },
+  {
+    id: 7,
+    name: "Beka Shiferaw",
+    role: "Graphic Design & Digital Strategy",
+    image: "/images/missionaries/beka.png?height=400&width=400",
+    bio: "Creating compelling visual content and strategies to enhance digital ministry impact.",
+    slug: "beka-shiferaw",
+  },
+  {
+    id: 8,
+    name: "Biniam Kassahun",
+    role: "Innovation & Technology",
+    image: "/images/missionaries/biniam.png?height=400&width=400",
+    bio: "Pioneering innovative technological solutions to advance the kingdom of God in Ethiopia.",
+    slug: "biniam-kassahun",
+  },
+];
+
 export default function HeroSection({ openDonationModal }: HeroSectionProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -41,131 +165,6 @@ export default function HeroSection({ openDonationModal }: HeroSectionProps) {
   const latestScrollY = useRef(0);
   const isTicking = useRef(false);
 
-  // Actual data from the codebase
-  const projects = [
-    {
-      id: 1,
-      slug: "yotor-church-management-system",
-      title: "Yotor - Modern Church Management",
-      description: "A Secure and Reliable Solution to Manage Your Church",
-      image: "/images/projects/yotor.png?height=200&width=300",
-    },
-    {
-      id: 2,
-      slug: "my-fellow",
-      title: "MY FELLOW",
-      description:
-        "An online platform designed to help you connect with Christian fellowship on campus.",
-      image: "/images/projects/my-fellow.png?height=200&width=300",
-    },
-    {
-      id: 3,
-      slug: "melhk-poadcast",
-      title: "MELHIK - PODCAST",
-      description:
-        "A program that helps Christian youth grow holistically, spiritually, emotionally, physically, and socially.",
-      image: "/images/projects/melhk.png?height=200&width=300",
-    },
-    {
-      id: 4,
-      slug: "gemenaye",
-      title: "GEMENAYE",
-      description:
-        "A platform for sharing testimonies of healing and grace, connecting hurting individuals with support.",
-      image: "/images/projects/gemenaye.png?height=200&width=300",
-    },
-    {
-      id: 5,
-      slug: "habesha-students",
-      title: "HABESHA STUDENTS",
-      description:
-        "A place where students can find true answers to life's questions and God's truth.",
-      image: "/images/projects/habesha-students.png?height=200&width=300",
-    },
-    {
-      id: 6,
-      slug: "hulentenawi",
-      title: "HULENTENAWI",
-      description:
-        "A mobile app that allows users to improve themselves and connect with others on the same journey.",
-      image: "/images/projects/hulentenawi.png?height=200&width=300",
-    },
-    {
-      id: 7,
-      slug: "jesus-film",
-      title: "JESUS FILM",
-      description:
-        "Sharing the Story of Jesus through film, reaching millions with the greatest story ever lived.",
-      image: "/images/projects/jesus-film.png?height=200&width=300",
-    },
-  ];
-
-  const missionaries: Missionary[] = [
-    {
-      id: 1,
-      name: "Senay Kumelachew",
-      role: "Digital Missions & Church Tech",
-      image: "/images/missionaries/senay.png?height=400&width=400",
-      bio: "Passionate about leveraging technology to strengthen churches and spread the gospel across Ethiopia.",
-      slug: "senay-kumelachew",
-    },
-    {
-      id: 2,
-      name: "Samson Usmael",
-      role: "Digital Evangelism & Discipleship",
-      image: "/images/missionaries/samson.png?height=400&width=400",
-      bio: "Dedicated to reaching the digital generation with the message of Christ through innovative online platforms.",
-      slug: "samson-usmael",
-    },
-    {
-      id: 3,
-      name: "Cherinet Alemu",
-      role: "Digital Missions & Mentorship",
-      image: "/images/missionaries/cherinet.png?height=400&width=400",
-      bio: "Committed to mentoring young leaders and equipping them for effective digital ministry.",
-      slug: "cherinet-alemu",
-    },
-    {
-      id: 4,
-      name: "Saron Yohannes",
-      role: "Product Leadership & Digital Evangelism",
-      image: "/images/missionaries/saron.png?height=400&width=400",
-      bio: "Leading innovative digital products that help spread the gospel and disciple believers.",
-      slug: "saron-yohannes",
-    },
-    {
-      id: 5,
-      name: "Rediet Kefetew",
-      role: "Content Creation & Mentorship",
-      image: "/images/missionaries/rediet.png?height=400&width=400",
-      bio: "Creating impactful content that resonates with young people and helps them grow in their faith.",
-      slug: "rediet-kefetew",
-    },
-    {
-      id: 6,
-      name: "Denamo Markos",
-      role: "Software Development & ML",
-      image: "/images/missionaries/denamo.png?height=400&width=400",
-      bio: "Developing cutting-edge software solutions to support ministry and outreach efforts.",
-      slug: "denamo-markos",
-    },
-    {
-      id: 7,
-      name: "Beka Shiferaw",
-      role: "Graphic Design & Digital Strategy",
-      image: "/images/missionaries/beka.png?height=400&width=400",
-      bio: "Creating compelling visual content and strategies to enhance digital ministry impact.",
-      slug: "beka-shiferaw",
-    },
-    {
-      id: 8,
-      name: "Biniam Kassahun",
-      role: "Innovation & Technology",
-      image: "/images/missionaries/biniam.png?height=400&width=400",
-      bio: "Pioneering innovative technological solutions to advance the kingdom of God in Ethiopia.",
-      slug: "biniam-kassahun",
-    },
-  ];
 
   useEffect(() => {
     if (searchQuery.trim() === "") {
@@ -176,7 +175,6 @@ export default function HeroSection({ openDonationModal }: HeroSectionProps) {
     const query = searchQuery.toLowerCase();
     const results: SearchResult[] = [];
 
-    // Search in projects
     projects.forEach((project) => {
       if (
         project.title.toLowerCase().includes(query) ||
@@ -193,7 +191,6 @@ export default function HeroSection({ openDonationModal }: HeroSectionProps) {
       }
     });
 
-    // Search in missionaries
     missionaries.forEach((missionary) => {
       if (
         missionary.name.toLowerCase().includes(query) ||
