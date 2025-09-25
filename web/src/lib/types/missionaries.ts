@@ -1,4 +1,3 @@
-// Define the shape of a single support need object
 export interface SupportNeed {
   item: string;
   amount: number;
@@ -23,8 +22,8 @@ export interface Missionary {
   focus?: string;
   status?: string;
   prayerRequests?: string[];
-  recentUpdates?: any;
-  supportNeeds?: SupportNeed[]; // FIX: Changed from 'any' to 'SupportNeed[]'
+  recentUpdates?: Record<string, unknown>[]; 
+  supportNeeds?: SupportNeed[];
   type?: string;
   role?: string;
   strategyId?: string;
@@ -47,7 +46,7 @@ export interface User {
   image?: string;
 }
 
-// --- DTOs remain the same ---
+// DTOs
 
 export interface CreateMissionaryDto {
   imageUrl?: string;
@@ -64,8 +63,8 @@ export interface CreateMissionaryDto {
   focus?: string;
   status?: string;
   prayerRequests?: string[];
-  recentUpdates?: any;
-  supportNeeds?: any;
+  recentUpdates?: Record<string, unknown>[]; 
+  supportNeeds?: SupportNeed[]; 
   type?: string;
   role?: string;
   strategyId?: string;
@@ -79,7 +78,7 @@ export interface CreateMissionaryDto {
   region?: string;
 }
 
-export interface UpdateMissionaryDto extends Partial<CreateMissionaryDto> {}
+// export interface UpdateMissionaryDto extends Partial<CreateMissionaryDto> {}
 
 export interface QueryMissionaryDto {
   search?: string;

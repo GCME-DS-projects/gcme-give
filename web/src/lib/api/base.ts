@@ -18,7 +18,7 @@ export class BaseApiClient {
         "Content-Type": "application/json",
         ...options.headers,
       },
-      credentials: "include", //required for Better Auth cookies
+      credentials: "include", // required for Better Auth cookies
       ...options,
     };
 
@@ -42,9 +42,9 @@ export class BaseApiClient {
     return this.request<T>(endpoint, { method: "GET", ...options });
   }
 
-  public post<T>(
+  public post<T, D = unknown>(
     endpoint: string,
-    data?: any,
+    data?: D,
     options?: RequestInit
   ): Promise<T> {
     return this.request<T>(endpoint, {
@@ -54,9 +54,9 @@ export class BaseApiClient {
     });
   }
 
-  public put<T>(
+  public put<T, D = unknown>(
     endpoint: string,
-    data?: any,
+    data?: D,
     options?: RequestInit
   ): Promise<T> {
     return this.request<T>(endpoint, {
@@ -66,9 +66,9 @@ export class BaseApiClient {
     });
   }
 
-  public patch<T>(
+  public patch<T, D = unknown>(
     endpoint: string,
-    data?: any,
+    data?: D,
     options?: RequestInit
   ): Promise<T> {
     return this.request<T>(endpoint, {
@@ -82,13 +82,15 @@ export class BaseApiClient {
     return this.request<T>(endpoint, { method: "DELETE", ...options });
   }
 
-
-
-  public async upload<T>(endpoint: string, formData: FormData, options?: RequestInit): Promise<T> {
+  public async upload<T>(
+    endpoint: string,
+    formData: FormData,
+    options?: RequestInit
+  ): Promise<T> {
     const config: RequestInit = {
-      method: 'POST',
+      method: "POST",
       body: formData,
-      credentials: 'include', // ensure cookies are sent
+      credentials: "include", // ensure cookies are sent
       ...options,
     };
 
@@ -100,7 +102,6 @@ export class BaseApiClient {
 
     return await response.json();
   }
-
 }
 
 export const apiClient = new BaseApiClient();

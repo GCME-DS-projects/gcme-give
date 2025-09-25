@@ -15,9 +15,15 @@ export const useGetStrategies = () => {
     queryKey: strategiesQueryKeys.lists(),
     queryFn: () => api.strategies.getStrategies(),
     staleTime: 5 * 60 * 1000,
-    retry: (failureCount, error: any) => error?.status !== 401 && failureCount < 2,
+    retry: (failureCount, error: unknown) => {
+      if (typeof error === "object" && error !== null && "status" in error) {
+        const status = (error as { status?: number }).status;
+        return status !== 401 && failureCount < 2;
+      }
+      return failureCount < 2;
+    },
   });
-}
+};
 
 export const useGetStrategy = (id: string) => {
   return useQuery({
@@ -25,9 +31,15 @@ export const useGetStrategy = (id: string) => {
     queryFn: () => api.strategies.getStrategy(id),
     enabled: !!id,
     staleTime: 5 * 60 * 1000,
-    retry: (failureCount, error: any) => error?.status !== 401 && failureCount < 2,
+    retry: (failureCount, error: unknown) => {
+      if (typeof error === "object" && error !== null && "status" in error) {
+        const status = (error as { status?: number }).status;
+        return status !== 401 && failureCount < 2;
+      }
+      return failureCount < 2;
+    },
   });
-}
+};
 
 export const useCreateStrategyMutation = () => {
   const queryClient = useQueryClient();

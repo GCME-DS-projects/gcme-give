@@ -75,28 +75,38 @@ export default function DonationModal({
       }
 
       // Create a descriptive title based on the donation type and details
-      const paymentTitle = `Great Commission Ethiopia - ${
-        type === "project" ? "Project" : "Missionary"
-      } Support: ${title}`;
+      // const paymentTitle = `Great Commission Ethiopia - ${
+      //   type === "project" ? "Project" : "Missionary"
+      // } Support: ${title}`;
 
       const apiKey = process.env.NEXT_PUBLIC_PAYMENT_API_KEY;
       const paymentGatewayUrl = "/api/payment";
 
-      const response = await fetch(paymentGatewayUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          amount,
-          title,
-          test: true,
-        }),
-      });
+        // remove unused: const paymentTitle = ...
 
-      const data: any = await response.json();
-      console.log("Payment response:", data);
+        const response = await fetch(paymentGatewayUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            amount,
+            title,
+            test: true,
+          }),
+        });
+
+        type PaymentResponse = {
+          success?: boolean;
+          paymentUrl?: string;
+          message?: string;
+          error?: string;
+        };
+
+        const data: PaymentResponse = await response.json();
+        console.log("Payment response:", data);
+
 
       if (!response.ok) {
         throw new Error(
@@ -133,14 +143,14 @@ export default function DonationModal({
     }
   };
 
-  function useAnchorOpen(link: string) {
-    let anchorEle = document.createElement("a");
-    anchorEle.setAttribute("href", link);
-    anchorEle.setAttribute("target", "_blank");
-    anchorEle.setAttribute("rel", "external");
-    anchorEle.style.display = "none";
-    anchorEle.click();
-  }
+  // function useAnchorOpen(link: string) {
+  //   let anchorEle = document.createElement("a");
+  //   anchorEle.setAttribute("href", link);
+  //   anchorEle.setAttribute("target", "_blank");
+  //   anchorEle.setAttribute("rel", "external");
+  //   anchorEle.style.display = "none";
+  //   anchorEle.click();
+  // }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 

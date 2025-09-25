@@ -467,7 +467,7 @@ export default function PartnershipPage() {
                   </CardHeader>
                   <CardContent>
                     <blockquote className="text-stone-700 italic mb-4 text-sm leading-relaxed">
-                      "{story.story}"
+                      `&quot;`{story.story}`&quot;`
                     </blockquote>
                     <div className="text-xs text-stone-500">
                       <strong>Supporting:</strong> {story.missionary}
@@ -487,7 +487,7 @@ export default function PartnershipPage() {
                 How Partnership Works
               </h2>
               <p className="text-xl text-stone-600 max-w-2xl mx-auto">
-                Starting your partnership is simple. Here's how to begin your
+                Starting your partnership is simple. Here&apos;s how to begin your
                 journey of transformational giving.
               </p>
             </div>

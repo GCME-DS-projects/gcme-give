@@ -12,7 +12,7 @@ export function AddProjectDialog({ isOpen, onOpenChange }: AddProjectDialogProps
   const { mutate: createProject, isPending } = useCreateProjectMutation();
 
   const handleSubmit = (data: Partial<Project>) => {
-    createProject(data as any, {
+    createProject(data as Partial<Project>, {
       onSuccess: () => {
         onOpenChange(false);
       },
@@ -28,7 +28,7 @@ export function AddProjectDialog({ isOpen, onOpenChange }: AddProjectDialogProps
             Fill in the details to create a new mission project.
           </DialogDescription>
         </DialogHeader>
-        <ProjectForm onSubmit={handleSubmit} isPending={isPending} />
+        <ProjectForm onSubmit={()=>handleSubmit} isPending={isPending} />
       </DialogContent>
     </Dialog>
   );

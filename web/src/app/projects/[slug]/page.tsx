@@ -16,7 +16,6 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowLeft,
-  Calendar,
   CheckCircle,
   Clock,
   Heart,
@@ -75,8 +74,10 @@ export default function ProjectDetailPage() {
   if (isError || !project) {
     notFound();
   }
-  
-  const fundingPercentage = Math.round((project.fundingRaised / project.fundingGoal) * 100);
+  const fundingRaised = Number(project.fundingRaised) || 0;
+  const fundingGoal = Number(project.fundingGoal) || 1; // avoid division by zero
+  const fundingPercentage = Math.round((fundingRaised / fundingGoal) * 100);
+
 
   return (
     <div className="bg-neutral-50">
@@ -174,10 +175,10 @@ export default function ProjectDetailPage() {
                      <div className="mb-4">
                        <div className="flex justify-between items-end mb-1">
                          <p className="text-2xl font-bold text-primary-600">
-                           {project.fundingRaised.toLocaleString('en-US')} ETB
+                           {project.fundingRaised.toLocaleString()} ETB
                          </p>
                          <p className="text-neutral-500 text-sm">
-                           raised of {project.fundingGoal.toLocaleString('en-US')} ETB
+                           raised of {project.fundingGoal.toLocaleString()} ETB
                          </p>
                        </div>
                        <Progress value={fundingPercentage} className="h-2"/>

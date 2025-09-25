@@ -31,9 +31,9 @@ export function EditStrategyDialog({ strategy, isOpen, onOpenChange }: EditStrat
       <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Strategy</DialogTitle>
-          <DialogDescription>
-            Update the details for "{strategy.title}".
-          </DialogDescription>
+            <DialogDescription>
+              Update the details for &quot;{strategy.title}&quot;.
+            </DialogDescription>
         </DialogHeader>
         <StrategyForm onSubmit={handleSubmit} isPending={isPending} defaultValues={strategy} />
       </DialogContent>

@@ -12,10 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Users,
-  Clock,
-  Target,
-  Search,
   Loader2,
 } from "lucide-react";
 import Image from "next/image";
@@ -173,7 +169,7 @@ export default function ProjectsPage() {
             </div>
           ) : isError ? (
             <div className="text-center text-red-500 py-24">
-              <p>{error?.message || "Failed to load projects."}</p>
+              <p>{(error as Error)?.message || "Failed to load projects."}</p>
             </div>
           ) : (
             <>

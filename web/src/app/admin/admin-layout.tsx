@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { Activity, Users, Target, TrendingUp, User, LogOut } from "lucide-react";
 import { useState } from "react";
+import Image from "next/image";
 
 const navLinks = [
   { href: "/admin", label: "Dashboard", icon: Activity },
@@ -12,7 +13,14 @@ const navLinks = [
   { href: "/admin/strategies", label: "Strategies", icon: TrendingUp },
 ];
 
-function SidebarLink({ href, label, icon: Icon, active }: any) {
+interface SidebarLinkProps {
+  href: string;
+  label: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  active: boolean;
+}
+
+function SidebarLink({ href, label, icon: Icon, active }: SidebarLinkProps) {
   return (
     <Link
       href={href}
@@ -29,6 +37,7 @@ function SidebarLink({ href, label, icon: Icon, active }: any) {
     </Link>
   );
 }
+
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -61,11 +70,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       >
         <div className="p-6 flex flex-col flex-1">
           <div className="mb-8 text-center">
-            <img
-              src="/logo/gcme-logo-white.png"
-              alt="GCME Logo"
-              className="w-32 h-32 mx-auto object-contain"
-            />
+          <Image
+            src="/logo/gcme-logo-white.png"
+            alt="GCME Logo"
+            width={128}
+            height={128}
+            className="mx-auto object-contain"
+          />
           </div>
           <nav className="flex-1 space-y-2">
             {navLinks.map((link) => (

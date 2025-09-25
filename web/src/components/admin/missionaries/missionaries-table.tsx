@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Missionary } from "@/lib/types";
 import { Edit, Eye, Mail, Phone, Trash2 } from "lucide-react";
+import Image from "next/image";
 
 interface Props {
   missionaries: Missionary[];
@@ -27,15 +28,21 @@ export function MissionariesTable({ missionaries, onView, onEdit, onDelete }: Pr
       <TableBody>
         {missionaries.map((m) => (
           <TableRow key={m.id}>
-            <TableCell>
-              <div className="flex items-center gap-4">
-                <img src={m.imageUrl || `https://ui-avatars.com/api/?name=${m.user.name}&background=random`} alt={m.title || 'User'} className="w-10 h-10 rounded-full object-cover"/>
-                <div>
-                  <p className="font-medium">{m.title}</p>
-                  {/* <p className="text-sm text-gray-500">{m.title}</p> */}
+              <TableCell>
+                <div className="flex items-center gap-4">
+                  <Image
+                    src={m.imageUrl || `https://ui-avatars.com/api/?name=${m.user.name}&background=random`}
+                    alt={m.title || "User"}
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="font-medium">{m.title}</p>
+                  </div>
                 </div>
-              </div>
-            </TableCell>
+              </TableCell>
+
             <TableCell>{m.location}</TableCell>
             <TableCell>
               {m.email && <div className="flex items-center gap-2 text-sm text-gray-600"><Mail className="w-4 h-4 text-gray-400"/> {m.email}</div>}

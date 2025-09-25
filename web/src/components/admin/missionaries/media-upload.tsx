@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { X, Image as Img, Upload } from 'lucide-react';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
+import Image from "next/image";
 
 interface MediaUploadProps {
   onImageUpload?: (imageUrl: string) => void;
@@ -112,11 +113,12 @@ export function MediaUpload({
       {/* Image preview */}
       {currentImage && !uploading && (
         <Card className="relative px-4 pb-14">
-
-          <img
+          <Image
             src={currentImage}
             alt="strategy image"
-            className="w-fit h-64 object-fit rounded-lg"
+            width={400}        
+            height={256}       
+            className="w-fit h-64 object-cover rounded-lg"
           />
           <Button
             type="button"
@@ -128,8 +130,7 @@ export function MediaUpload({
           >
             <X className="h-4 w-4" />
           </Button>
-          
-          {/* Replace image button */}
+
           <div className="absolute bottom-2 left-2">
             <Button
               type="button"

@@ -16,7 +16,7 @@ export function DeleteMissionaryAlert({ isOpen, onOpenChange, onConfirmDelete, i
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone and will permanently delete this missionary's profile.
+            This action cannot be undone and will permanently delete this missionary&apos;s profile.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

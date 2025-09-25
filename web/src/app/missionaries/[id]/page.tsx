@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  MapPin, Calendar, Mail, Phone, Globe, Heart, Target, Users, ArrowLeft,
-  Loader2, Award, BookOpen, MessageCircle, Share2, Gift, ExternalLink
+  MapPin, Calendar, Target, Users, ArrowLeft,
+  Loader2, Award, MessageCircle, Gift
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
