@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart, Users, Globe } from "lucide-react";
-import useEmblaCarousel from "embla-carousel-react";
 import Header from "@/components/public/common/header";
 import HeroSection from "@/components/public/landing/hero-section";
 import ProjectsSection from "@/components/public/landing/projects-section";
@@ -24,54 +23,6 @@ export default function MissionaryDonationPlatform() {
     description: "",
   });
 
-  // Embla Carousel configuration for Projects
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    align: "start",
-    loop: true,
-    dragFree: true,
-    containScroll: "trimSnaps",
-    slidesToScroll: 1,
-    inViewThreshold: 0.7,
-  });
-
-  // Embla Carousel configuration for Missionaries (no speed/duration for CSS animation)
-  // const [missionariesRef, missionariesApi] = useEmblaCarousel({
-  //   align: "start",
-  //   loop: true,
-  //   dragFree: true,
-  //   containScroll: "trimSnaps",
-  //   slidesToScroll: 1,
-  //   inViewThreshold: 0.7,
-  // });
-
-  const autoplay = useCallback(() => {
-    if (!emblaApi) return;
-    emblaApi.scrollNext();
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    const autoplayInterval = setInterval(autoplay, 5000); // Projects autoplay
-
-    const onUserInteraction = () => {
-      clearInterval(autoplayInterval);
-      setTimeout(() => {
-        setInterval(autoplay, 5000);
-      }, 10000);
-    };
-
-    emblaApi.on("pointerDown", onUserInteraction);
-    emblaApi.on("pointerUp", onUserInteraction);
-
-    return () => {
-      clearInterval(autoplayInterval);
-      emblaApi.off("pointerDown", onUserInteraction);
-      emblaApi.off("pointerUp", onUserInteraction);
-    };
-  }, [emblaApi, autoplay]);
-
-  // Missionary carousel CSS animation does not use Embla API for direct scroll, so no autoplay function for it here.
 
   const openDonationModal = (
     type: "project" | "missionary",
@@ -101,147 +52,6 @@ export default function MissionaryDonationPlatform() {
     { label: "Lives Transformed", value: "8,500+", icon: Heart },
   ];
 
-  // const projects = [
-  //   {
-  //     id: 1,
-  //     slug: "yotor-church-management-system",
-  //     title: "Yotor - Modern Church Management",
-  //     description: "A Secure and Reliable Solution to Manage Your Church",
-  //     image: "/images/projects/yotor.png?height=200&width=300",
-  //     category: "Technology",
-  //     duration: "8 months",
-  //     beneficiaries: "2,500 people",
-  //     teamSize: "8 volunteers",
-  //     urgency: "High Priority",
-  //   },
-  //   {
-  //     id: 2,
-  //     slug: "my-fellow",
-  //     title: "MY FELLOW",
-  //     description:
-  //       "an online platform designed to help you connect with Christian fellowship on campus. We understand that being a new student can be overwhelming, especially when it comes to finding a community of believers. That's why we are here to assist you every step of the way.",
-  //     image: "/images/projects/my-fellow.png?height=200&width=300",
-  //     category: "Education",
-  //     duration: "12 months",
-  //     beneficiaries: "1500 youth",
-  //     teamSize: "8 volunteers",
-  //     urgency: "Ongoing",
-  //   },
-  //   {
-  //     id: 3,
-  //     slug: "melhk-poadcast",
-  //     title: "MELHIK - PODCAST",
-  //     description:
-  //       "Melhk Podcast is a program that helps Christian youth grow holistically, spiritually, emotionally, physically, and socially, and helps us have a biblical foundation by addressing pressing issues among young people.",
-  //     image: "/images/projects/melhk.png?height=200&width=300",
-  //     category: "Poadcast",
-  //     duration: "2 years",
-  //     beneficiaries: "5,000 people",
-  //     teamSize: "8 volunteers",
-  //     urgency: "Ongoing",
-  //   },
-  //   {
-  //     id: 4,
-  //     slug: "gemenaye",
-  //     title: "GEMENAYE",
-  //     description:
-  //       "We all have different paths in life, but to a greater or lesser extent, we have all had issues that we have held within ourselves and faced; perhaps we have come out of our situation because we met someone who helped us, listened to us, and gave us true love.",
-  //     image: "/images/projects/gemenaye.png?height=200&width=300",
-  //     category: "Tv-program",
-  //     duration: "10 months",
-  //     beneficiaries: "800 families",
-  //     teamSize: "6 volunteers",
-  //     urgency: "Critical Need",
-  //   },
-  //   {
-  //     id: 5,
-  //     slug: "habesha-students",
-  //     title: "HABESHA STUDENTS",
-  //     description:
-  //       "It is a place where students can find true answers to life's questions and God's truth. It also works with a website called addishiwot.net to send a series of lessons to those who are interested. This website is also available as a mobile application.",
-  //     image: "/images/projects/habesha-students.png?height=200&width=300",
-  //     category: "Online-platform",
-  //     duration: "10 months",
-  //     beneficiaries: "1000 families",
-  //     teamSize: "5 volunteers",
-  //     urgency: "Ongoing",
-  //   },
-  //   {
-  //     id: 6,
-  //     slug: "hulentenawi",
-  //     title: "HULENTENAWI",
-  //     description:
-  //       "Everyone these days is concerned about how they can improve themselves and live with the society they live in, but with all these questions, we are confused about who to ask. But now, a mobile app that allows us to improve ourselves in these and many other ways now allows us to chat with people who are learning along with you.",
-  //     image: "/images/projects/hulentenawi.png?height=200&width=300",
-  //     category: "Online-platform",
-  //     duration: "10 months",
-  //     beneficiaries: "1000 families",
-  //     teamSize: "5 volunteers",
-  //     urgency: "Ongoing",
-  //   },
-  //   {
-  //     id: 7,
-  //     slug: "jesus-film",
-  //     title: "JESUS FILM",
-  //     description:
-  //       "We want everyone, everywhere to encounter Jesus Sharing the Story of Jesus We believe film is the most dynamic way to hear and see the greatest story ever lived — so we are driven to bring Christ-centered video to the ends of the earth. More than 490 million people have come to Jesus after watching these films!",
-  //     image: "/images/projects/jesus-film.png?height=200&width=300",
-  //     category: "Online-platform",
-  //     duration: "10 months",
-  //     beneficiaries: "1000 families",
-  //     teamSize: "5 volunteers",
-  //     urgency: "Ongoing",
-  //   },
-  // ];
-
-  const missionariesContainerRef = useRef<HTMLDivElement>(null);
-  const [isHovered] = useState(false);
-
-  useEffect(() => {
-    const container = missionariesContainerRef.current;
-    if (!container) return;
-
-    let animationFrame: number;
-    let startTime: number | null = null;
-    const duration = 60000; // 60 seconds for one complete cycle
-    const totalWidth = container.scrollWidth / 3; // Divide by 3 since we have three sets
-
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const elapsed = timestamp - startTime;
-      const progress = (elapsed % duration) / duration;
-
-      if (!isHovered) {
-        // Calculate the position based on progress
-        const translateX = -progress * totalWidth * 2;
-
-        // When we reach the end of the second set, smoothly transition to the beginning
-        if (translateX <= -totalWidth * 2) {
-          // Remove transition temporarily
-          container.style.transition = "none";
-          // Reset position
-          container.style.transform = `translateX(0)`;
-          // Force a reflow
-          // container.offsetHeight;
-          void container.offsetHeight;
-          // Restore transition
-          container.style.transition = "transform 1000ms linear";
-          // Reset start time
-          startTime = timestamp;
-        } else {
-          container.style.transform = `translateX(${translateX}px)`;
-        }
-      }
-
-      animationFrame = requestAnimationFrame(animate);
-    };
-
-    animationFrame = requestAnimationFrame(animate);
-
-    return () => {
-      cancelAnimationFrame(animationFrame);
-    };
-  }, [isHovered]);
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -279,27 +89,10 @@ export default function MissionaryDonationPlatform() {
       </section>
 
       {/* Projects Section */}
-      {/* <ProjectsSection openDonationModal={openDonationModal} /> */}
-      <div
-        ref={missionariesContainerRef}
-        className="flex flex-nowrap will-change-transform"
-        style={{ transition: "none" }}
-      >
-        <ProjectsSection openDonationModal={openDonationModal} />
-      </div>
+      <ProjectsSection openDonationModal={openDonationModal} />
 
-
-
-
-      {/* Strategies Section */}
-      {/* <MissionariesSection /> */}
-      <div
-        ref={emblaRef}
-        className="flex flex-nowrap will-change-transform"
-        style={{ transition: "none" }}
-      >
-        <MissionariesSection />
-      </div>
+      {/* Missionaries Section */}
+      <MissionariesSection />
 
 
       {/* Call to Action */}

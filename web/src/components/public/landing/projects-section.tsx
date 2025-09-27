@@ -28,7 +28,7 @@ export default function ProjectsSection({
   openDonationModal,
 }: ProjectsSectionProps) {
   // --- Data Fetching ---
-  const { data: projects = [], isLoading } = useGetProjects();
+  const { data: projects = [], isLoading, error } = useGetProjects();
 
   // --- State for Animation ---
   const [isHovered, setIsHovered] = useState(false);
@@ -45,15 +45,17 @@ export default function ProjectsSection({
   const calculateDimensions = useCallback(() => {
     if (!projectsContainerRef.current || projects.length === 0) return;
 
+    // Calculate card width including margin
     const firstCard = projectsContainerRef.current.querySelector(
       ".group.flex-\\[0_0_400px\\]"
     );
     if (firstCard) {
       const computedStyle = window.getComputedStyle(firstCard);
-      const marginRight = parseFloat(computedStyle.marginRight);
+      const marginRight = parseFloat(computedStyle.marginRight) || 0;
       cardWidthWithMargin.current = firstCard.clientWidth + marginRight;
     }
 
+    // Calculate total width of one set of projects
     const firstProjectGroup =
       projectsContainerRef.current.querySelector(".flex-nowrap.shrink-0");
     if (firstProjectGroup) {
@@ -84,10 +86,12 @@ export default function ProjectsSection({
 
   useEffect(() => {
     const startSlide = () => {
+      // Skip animation if conditions aren't met
       if (
         isHovered ||
         cardWidthWithMargin.current === 0 ||
-        totalProjectsWidth.current === 0
+        totalProjectsWidth.current === 0 ||
+        projects.length === 0
       ) {
         animationTimeoutRef.current = setTimeout(startSlide, 100);
         return;
@@ -99,6 +103,7 @@ export default function ProjectsSection({
       const nextTranslateX =
         currentTranslateX.current - cardWidthWithMargin.current;
 
+      // Apply smooth transition
       container.style.transition = `transform ${
         slideDuration / 1000
       }s ease-in-out`;
@@ -107,6 +112,7 @@ export default function ProjectsSection({
       animationTimeoutRef.current = setTimeout(() => {
         currentTranslateX.current = nextTranslateX;
 
+        // Reset position when we've scrolled through one complete set
         if (Math.abs(currentTranslateX.current) >= totalProjectsWidth.current) {
           container.style.transition = "none";
           currentTranslateX.current += totalProjectsWidth.current;
@@ -117,12 +123,14 @@ export default function ProjectsSection({
           }s ease-in-out`;
         }
 
+        // Continue animation after pause
         animationTimeoutRef.current = setTimeout(startSlide, pauseDuration);
       }, slideDuration);
     };
 
+    // Start animation only when we have projects
     if (projects.length > 0) {
-        animationTimeoutRef.current = setTimeout(startSlide, pauseDuration);
+      animationTimeoutRef.current = setTimeout(startSlide, pauseDuration);
     }
 
     return () => {
@@ -142,6 +150,23 @@ export default function ProjectsSection({
             <Loader2 className="animate-spin h-8 w-8 text-primary-600 mx-auto mb-4" />
             <p className="text-neutral-600">Loading projects...</p>
           </div>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="text-center py-20">
+          <p className="text-red-600 mb-4">
+            Failed to load projects. Please try again later.
+          </p>
+          <Button 
+            onClick={() => window.location.reload()} 
+            variant="outline"
+            className="border-primary-600 text-primary-600 hover:bg-primary-50"
+          >
+            Retry
+          </Button>
         </div>
       );
     }

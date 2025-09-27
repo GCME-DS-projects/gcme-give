@@ -15,10 +15,12 @@ export default function MissionariesSection() {
   const scrollSpeed = 0.8;
 
   // Fetch missionaries using the custom React Query hook
-  const { data: missionaries = [], isLoading } = useGetMissionaries();
+  const { data: missionaries = [], isLoading, error } = useGetMissionaries();
 
-  // Animation step logic remains the same
+  // Optimized animation step with performance considerations
   const animateStep = useCallback(() => {
+    if (missionaries.length === 0) return;
+    
     currentTranslateX.current -= scrollSpeed;
 
     // Wrap around logic for seamless loop
@@ -29,7 +31,7 @@ export default function MissionariesSection() {
     if (missionariesContainerRef.current) {
       missionariesContainerRef.current.style.transform = `translateX(${currentTranslateX.current}px)`;
     }
-  }, [scrollSpeed]);
+  }, [scrollSpeed, missionaries.length]);
 
   // Effect for calculating content width when missionaries data loads/changes
   useEffect(() => {
@@ -103,6 +105,36 @@ export default function MissionariesSection() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
               <p className="text-neutral-600">Loading missionaries...</p>
             </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className="py-12 md:py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-2xl md:text-4xl font-bold text-neutral-800 mb-4">
+              Our Dedicated Missionaries
+            </h2>
+            <p className="text-lg md:text-xl text-neutral-600 max-w-2xl mx-auto">
+              Meet the passionate individuals who are making a difference in
+              communities across Ethiopia.
+            </p>
+          </div>
+          <div className="text-center py-12">
+            <p className="text-red-600 mb-4">
+              Failed to load missionaries. Please try again later.
+            </p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-4 py-2 border border-primary-600 text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
+            >
+              Retry
+            </button>
           </div>
         </div>
       </section>
